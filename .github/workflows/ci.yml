@@ -89,7 +89,7 @@ jobs:
         uses: luizfonseca/github-actions-rubocop@2.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      
       - name: Run test and public code coverage
         uses: paambaati/codeclimate-action@v9.0.0
         env:
