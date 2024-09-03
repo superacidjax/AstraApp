@@ -1,0 +1,1 @@
+class ActionWait < Action; end

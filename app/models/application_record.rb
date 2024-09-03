@@ -1,6 +1,9 @@
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
+  # used for global email validation
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+
   before_create :generate_uuid_v7
 
   private

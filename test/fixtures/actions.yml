@@ -1,0 +1,68 @@
+# read about fixtures at https://api.rubyonrails.org/classes/activerecord/fixtureset.html
+
+action_email:
+  account: one
+  name: "email action"
+  type: "ActionEmail"
+  data: {}
+
+action_sms:
+  account: one
+  name: "sms action"
+  type: "ActionSms"
+  data: {}
+
+action_wait:
+  account: one
+  name: "wait action"
+  type: "ActionWait"
+  data: {}
+
+action_notify:
+  account: one
+  name: "notify action"
+  type: "ActionNotify"
+  data:
+    destination: "user@example.com"
+
+action_connect:
+  account: one
+  name: "connect action"
+  type: "ActionConnect"
+  data:
+    integration_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    integration_name: "integration one"
+
+action_email:
+  account: two
+  name: "email action"
+  type: "ActionEmail"
+  data: {}
+
+action_sms:
+
+  account: two
+  name: "sms action"
+  type: "ActionSms"
+  data: {}
+
+action_wait:
+  account: two
+  name: "wait action"
+  type: "ActionWait"
+  data: {}
+
+action_notify:
+  account: two
+  name: "notify action"
+  type: "ActionNotify"
+  data:
+    destination: "user@example.com"
+
+action_connect:
+  account: two
+  name: "connect action"
+  type: "ActionConnect"
+  data:
+    integration_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    integration_name: "integration two"

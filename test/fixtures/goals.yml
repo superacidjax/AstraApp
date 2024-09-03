@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  success_rate: 9.99
+
+two:
+  account: two
+  success_rate: 9.99

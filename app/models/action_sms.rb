@@ -1,0 +1,1 @@
+class ActionSms < Action; end

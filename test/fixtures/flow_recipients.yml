@@ -1,0 +1,22 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+flow_recipient_one:
+  flow: one                    # Assuming you have a fixture named 'one' for the Flow model
+  person_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"  # Sample UUID for a person
+  status: active               # Default status
+  last_completed_flow_action_id: <%= nil %>  # No flow action completed yet
+  is_goal_achieved: false      # Default is_goal_achieved value
+
+flow_recipient_two:
+  flow: one                    # Assuming the same flow for demonstration purposes
+  person_id: "e17ac10b-58cc-4372-a567-0e02b2c3d480"  # Another sample UUID for a person
+  status: complete             # Example of a different status
+  last_completed_flow_action_id: <%= SecureRandom.uuid %> # Sample UUID for last completed flow action
+  is_goal_achieved: true       # Goal achieved for this recipient
+
+flow_recipient_three:
+  flow: two                    # Assuming you have another fixture named 'two' for the Flow model
+  person_id: "c17ac10b-58cc-4372-a567-0e02b2c3d481"  # Yet another sample UUID for a person
+  status: paused               # Example of another status
+  last_completed_flow_action_id: <%= nil %>  # No flow action completed yet
+  is_goal_achieved: false      # Default is_goal_achieved value

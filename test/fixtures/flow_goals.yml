@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  flow: one
+  goal: one
+  success_rate: 9.99
+
+two:
+  flow: two
+  goal: two
+  success_rate: 9.99
