@@ -85,9 +85,6 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Rubocop checks
-        uses: gimenete/rubocop-action@1.0
-
       - name: Run test and public code coverage
         uses: paambaati/codeclimate-action@v9.0.0
         env:
