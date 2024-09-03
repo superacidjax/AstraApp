@@ -86,15 +86,11 @@ jobs:
           bundler-cache: true
 
       - name: Run test and public code coverage
-        uses: paambaati/codeclimate-action@v9.0.0
         env:
-          CC_TEST_REPORTER_ID: 45df97be132ac6a56232fcd06fe4437132133a7a0c8679473a58780a92f19b81
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           # REDIS_URL: redis://localhost:6379/0
-        with:
-          coverageCommand: bin/rails db:test:prepare test test:system
-        # run: bin/rails db:test:prepare test test:system
+        run: bin/rails db:test:prepare test test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
