@@ -13,12 +13,11 @@ gem "redis", ">= 4.0.1"
 gem "bootsnap", require: false
 gem "activeresource"
 gem "uuid7"
+gem "rubocop-rails-omakase", require: false
 
 group :development, :test do
   gem "pry-rails"
   gem "brakeman", require: false
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase"
 end
 
 group :development do
