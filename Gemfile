@@ -15,6 +15,7 @@ gem "redis", ">= 4.0.1"
 gem "bootsnap", require: false
 gem "activeresource"
 gem "uuid7"
+gem "ostruct"
 
 group :development, :test do
   gem "pry-rails"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_02_184829) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_25_105956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -40,6 +40,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_184829) do
     t.index ["account_id"], name: "index_actions_on_account_id"
     t.index ["data"], name: "index_actions_on_data", using: :gin
     t.index ["type"], name: "index_actions_on_type"
+  end
+
+  create_table "client_application_people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "person_id", null: false
+    t.uuid "client_application_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_application_id"], name: "index_client_application_people_on_client_application_id"
+    t.index ["person_id"], name: "index_client_application_people_on_person_id"
   end
 
   create_table "client_applications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -114,6 +123,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_184829) do
     t.index ["account_id"], name: "index_goals_on_account_id"
   end
 
+  create_table "people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_people_on_account_id"
+  end
+
   create_table "rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.string "name", null: false
@@ -132,6 +148,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_184829) do
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
   add_foreign_key "actions", "accounts"
+  add_foreign_key "client_application_people", "client_applications"
+  add_foreign_key "client_application_people", "people"
   add_foreign_key "client_applications", "accounts"
   add_foreign_key "flow_actions", "actions"
   add_foreign_key "flow_actions", "flows"
@@ -142,5 +160,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_184829) do
   add_foreign_key "goal_rules", "goals"
   add_foreign_key "goal_rules", "rules"
   add_foreign_key "goals", "accounts"
+  add_foreign_key "people", "accounts"
   add_foreign_key "rules", "accounts"
 end
