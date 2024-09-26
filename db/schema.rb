@@ -152,6 +152,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_26_174741) do
     t.uuid "account_id", null: false
     t.uuid "client_application_id", null: false
     t.text "name", null: false
+    t.integer "value_type", default: 0, null: false
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
