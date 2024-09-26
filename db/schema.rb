@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_25_105956) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_26_174741) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -138,6 +138,28 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_25_105956) do
     t.index ["account_id"], name: "index_rules_on_account_id"
   end
 
+  create_table "trait_values", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "person_id", null: false
+    t.uuid "trait_id", null: false
+    t.text "data", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_trait_values_on_person_id"
+    t.index ["trait_id"], name: "index_trait_values_on_trait_id"
+  end
+
+  create_table "traits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "client_application_id", null: false
+    t.text "name", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_traits_on_account_id"
+    t.index ["client_application_id"], name: "index_traits_on_client_application_id"
+    t.index ["is_active"], name: "index_traits_on_is_active"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email"
     t.datetime "created_at", null: false
@@ -162,4 +184,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_25_105956) do
   add_foreign_key "goals", "accounts"
   add_foreign_key "people", "accounts"
   add_foreign_key "rules", "accounts"
+  add_foreign_key "trait_values", "people"
+  add_foreign_key "trait_values", "traits"
+  add_foreign_key "traits", "accounts"
+  add_foreign_key "traits", "client_applications"
 end

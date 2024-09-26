@@ -1,0 +1,11 @@
+one:
+  account: one
+  client_application: one
+  name: MyText
+  is_active: false
+
+two:
+  account: two
+  client_application: two
+  name: MyText
+  is_active: false
