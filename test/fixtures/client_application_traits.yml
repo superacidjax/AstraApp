@@ -1,0 +1,7 @@
+one:
+  trait: one
+  client_application: one
+
+two:
+  trait: two
+  client_application: two

@@ -19,4 +19,10 @@ class AccountTest < ActiveSupport::TestCase
     assert account.invalid?, "Account without a name should be invalid"
     assert account.errors[:name].any?, "There should be an error for the name"
   end
+
+  test "should not allow duplicate account names" do
+    duplicate_account = Account.new(name: @account.name)
+    assert_not duplicate_account.save, "Saved an account with a duplicate name"
+    assert duplicate_account.errors[:name].any?, "There should be an error for duplicate name"
+  end
 end
