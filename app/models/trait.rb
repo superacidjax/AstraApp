@@ -1,7 +1,10 @@
 class Trait < ApplicationRecord
   belongs_to :account
-  belongs_to :client_application
+  has_many :client_applications
+  has_many :client_application_traits
+  has_many :client_applications, through: :client_application_traits
   has_many :people
+  has_many :trait_values
   has_many :people, through: :trait_values
 
   validates :name, presence: true

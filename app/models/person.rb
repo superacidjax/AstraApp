@@ -3,5 +3,6 @@ class Person < ApplicationRecord
   has_many :client_application_people
   has_many :client_applications, through: :client_application_people
   has_many :traits
+  has_many :trait_values
   has_many :traits, through: :trait_values
 end

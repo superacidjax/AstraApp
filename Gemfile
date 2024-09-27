@@ -16,6 +16,7 @@ gem "bootsnap", require: false
 gem "activeresource"
 gem "uuid7"
 gem "ostruct"
+gem "good_job"
 
 group :development, :test do
   gem "pry-rails"
