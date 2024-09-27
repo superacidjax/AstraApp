@@ -7,6 +7,6 @@ class CreatePropertyValues < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    add_index :property_values, [ :event_id, :event_id, :data]
+    add_index :property_values, [ :event_id, :event_id, :data ]
   end
 end
