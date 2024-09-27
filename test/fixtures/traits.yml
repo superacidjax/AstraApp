@@ -1,0 +1,11 @@
+one:
+  account: one
+  name: MyText
+  is_active: true
+  value_type: text
+
+two:
+  account: two
+  name: MyText
+  is_active: true
+  value_type: numeric

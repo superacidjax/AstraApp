@@ -1,0 +1,9 @@
+one:
+  person: one
+  trait: one
+  data: MyText
+
+two:
+  person: two
+  trait: two
+  data: MyText
