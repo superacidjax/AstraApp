@@ -299,6 +299,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
+    skylight (6.0.4)
+      activesupport (>= 5.2.0)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -365,6 +367,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   selenium-webdriver
   simplecov
+  skylight
   sprockets-rails
   stimulus-rails
   turbo-rails

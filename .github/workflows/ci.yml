@@ -84,15 +84,19 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Run test and public code coverage
+      
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
         env:
+          CC_TEST_REPORTER_ID: 45df97be132ac6a56232fcd06fe4437132133a7a0c8679473a58780a92f19b81
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
-
+        with:
+          coverageCommand: bin/rails db:test:prepare test test:system
+          coverageLocations: ${{ github.workspace }}/coverage/coverage.json:simplecov
+          debug: true
+      
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
         if: failure()

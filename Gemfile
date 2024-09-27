@@ -24,6 +24,10 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+group :production do
+  gem "skylight"
+end
+
 group :development do
   gem "rails-erd"
   gem "web-console"
