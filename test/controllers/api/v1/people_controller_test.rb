@@ -17,7 +17,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should create person, traits, and trait values with valid data" do
     assert_difference("Person.count", 1) do
-      assert_difference("Trait.count", 4) do # Expecting 4 traits
+      assert_difference("Trait.count", 4) do
         assert_difference("TraitValue.count", 4) do
           post api_v1_people_url, params: @valid_person, as: :json, headers: { Authorization: basic_auth_header }
         end
@@ -27,16 +27,14 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
 
     response_data = JSON.parse(response.body)
-    assert_equal @valid_person[:user_id], response_data["user_id"]
-    assert_equal @valid_person[:traits], response_data["traits"] # Expecting string keys here
-    assert_equal @valid_person[:timestamp], response_data["timestamp"]
+    assert_equal @valid_person[:user_id], response_data["client_user_id"]
+    assert_equal @valid_person[:traits], response_data["traits"]
+    assert_equal @valid_person[:timestamp], response_data["client_timestamp"]
     assert_equal @valid_person[:application_id], response_data["application_id"]
 
-    # Verify the person exists
     person = Person.find_by(client_user_id: @valid_person[:user_id])
     assert_not_nil person
 
-    # Verify the traits and trait values were created correctly
     @valid_person[:traits].each do |trait_name, trait_value|
       trait = Trait.find_by(name: trait_name, account_id: person.account_id)
       assert_not_nil trait, "Trait #{trait_name} should exist"
@@ -91,7 +89,6 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should return method not allowed for non-POST requests" do
-    # Test GET, PUT, PATCH, DELETE requests
     [ :get, :put, :patch, :delete ].each do |http_method|
       send(http_method, api_v1_people_url, as: :json, headers: { Authorization: basic_auth_header })
       assert_response :not_found, "Expected #{http_method.upcase} to be rejected with 404"

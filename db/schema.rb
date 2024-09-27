@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -42,13 +42,34 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
     t.index ["type"], name: "index_actions_on_type"
   end
 
+  create_table "client_application_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "client_application_id", null: false
+    t.uuid "event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_application_id", "event_id"], name: "idx_on_client_application_id_event_id_732fdc1f00"
+    t.index ["client_application_id"], name: "index_client_application_events_on_client_application_id"
+    t.index ["event_id"], name: "index_client_application_events_on_event_id"
+  end
+
   create_table "client_application_people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "person_id", null: false
     t.uuid "client_application_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["client_application_id", "person_id"], name: "idx_on_client_application_id_person_id_3f12dbc93a"
     t.index ["client_application_id"], name: "index_client_application_people_on_client_application_id"
     t.index ["person_id"], name: "index_client_application_people_on_person_id"
+  end
+
+  create_table "client_application_properties", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "property_id", null: false
+    t.uuid "client_application_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_application_id", "property_id"], name: "idx_on_client_application_id_property_id_30d1d917be"
+    t.index ["client_application_id"], name: "index_client_application_properties_on_client_application_id"
+    t.index ["property_id"], name: "index_client_application_properties_on_property_id"
   end
 
   create_table "client_application_traits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -56,6 +77,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
     t.uuid "client_application_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["client_application_id", "trait_id"], name: "idx_on_client_application_id_trait_id_f9598eb181"
     t.index ["client_application_id"], name: "index_client_application_traits_on_client_application_id"
     t.index ["trait_id"], name: "index_client_application_traits_on_trait_id"
   end
@@ -66,6 +88,18 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_client_applications_on_account_id"
+  end
+
+  create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.text "name", null: false
+    t.string "client_user_id", default: "anonymous", null: false
+    t.datetime "client_timestamp", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_events_on_account_id"
+    t.index ["client_user_id", "account_id", "name"], name: "index_events_on_client_user_id_and_account_id_and_name", unique: true
+    t.index ["client_user_id"], name: "index_events_on_client_user_id"
   end
 
   create_table "flow_actions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -93,7 +127,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
 
   create_table "flow_recipients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "flow_id", null: false
-    t.string "person_id", null: false
+    t.uuid "person_id", null: false
     t.integer "status", default: 5, null: false
     t.uuid "last_completed_flow_action_id"
     t.boolean "is_goal_achieved", default: false, null: false
@@ -223,11 +257,34 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
 
   create_table "people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "client_user_id", null: false
+    t.string "client_user_id", null: false
+    t.datetime "client_timestamp", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_people_on_account_id"
     t.index ["client_user_id", "account_id"], name: "index_people_on_client_user_id_and_account_id", unique: true
+  end
+
+  create_table "properties", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.text "name", null: false
+    t.boolean "is_active", default: true, null: false
+    t.integer "value_type", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "is_active"], name: "index_properties_on_account_id_and_is_active"
+    t.index ["account_id"], name: "index_properties_on_account_id"
+  end
+
+  create_table "property_values", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "event_id", null: false
+    t.uuid "property_id", null: false
+    t.text "data", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "data"], name: "index_property_values_on_event_id_and_event_id_and_data"
+    t.index ["event_id"], name: "index_property_values_on_event_id"
+    t.index ["property_id"], name: "index_property_values_on_property_id"
   end
 
   create_table "rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -245,6 +302,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id"], name: "index_trait_values_on_person_id"
+    t.index ["trait_id", "person_id", "data"], name: "index_trait_values_on_trait_id_and_person_id_and_data"
     t.index ["trait_id"], name: "index_trait_values_on_trait_id"
   end
 
@@ -255,8 +313,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["account_id", "is_active"], name: "index_traits_on_account_id_and_is_active"
     t.index ["account_id"], name: "index_traits_on_account_id"
-    t.index ["is_active"], name: "index_traits_on_is_active"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -269,21 +327,30 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_120805) do
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
   add_foreign_key "actions", "accounts"
+  add_foreign_key "client_application_events", "client_applications"
+  add_foreign_key "client_application_events", "events"
   add_foreign_key "client_application_people", "client_applications"
   add_foreign_key "client_application_people", "people"
+  add_foreign_key "client_application_properties", "client_applications"
+  add_foreign_key "client_application_properties", "properties"
   add_foreign_key "client_application_traits", "client_applications"
   add_foreign_key "client_application_traits", "traits"
   add_foreign_key "client_applications", "accounts"
+  add_foreign_key "events", "accounts"
   add_foreign_key "flow_actions", "actions"
   add_foreign_key "flow_actions", "flows"
   add_foreign_key "flow_goals", "flows"
   add_foreign_key "flow_goals", "goals"
   add_foreign_key "flow_recipients", "flows"
+  add_foreign_key "flow_recipients", "people"
   add_foreign_key "flows", "accounts"
   add_foreign_key "goal_rules", "goals"
   add_foreign_key "goal_rules", "rules"
   add_foreign_key "goals", "accounts"
   add_foreign_key "people", "accounts"
+  add_foreign_key "properties", "accounts"
+  add_foreign_key "property_values", "events"
+  add_foreign_key "property_values", "properties"
   add_foreign_key "rules", "accounts"
   add_foreign_key "trait_values", "people"
   add_foreign_key "trait_values", "traits"

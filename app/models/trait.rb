@@ -4,7 +4,7 @@ class Trait < ApplicationRecord
   has_many :client_application_traits
   has_many :client_applications, through: :client_application_traits
   has_many :people
-  has_many :trait_values
+  has_many :trait_values, dependent: :destroy
   has_many :people, through: :trait_values
 
   validates :name, presence: true

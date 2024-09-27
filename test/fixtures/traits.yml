@@ -6,6 +6,6 @@ one:
 
 two:
   account: two
-  name: MyText
+  name: MoreText
   is_active: true
   value_type: numeric

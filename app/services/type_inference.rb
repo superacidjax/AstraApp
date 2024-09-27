@@ -1,9 +1,7 @@
 module TypeInference
   def infer_type(value)
     case value
-    when /\A\d+\z/
-      "numeric"
-    when /\A\d+\.\d+\z/
+    when /\A\d+(\.\d+)?\z/
       "numeric"
     when /\Atrue\z/i, /\Afalse\z/i
       "boolean"

@@ -33,7 +33,7 @@ class ClientApplicationTest < ActiveSupport::TestCase
   end
 
   test "should save client application with duplicate name in different accounts" do
-    different_account = accounts(:two) # Assuming you have a fixture named `two` for the Account model
+    different_account = accounts(:two)
     client_application_with_duplicate_name = ClientApplication.new(account: different_account, name: @client_application.name)
     assert client_application_with_duplicate_name.save, "Did not save the client application with a duplicate name in a different account"
   end

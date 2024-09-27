@@ -1,10 +1,10 @@
-class Event < ActiveResource::Base
-  self.site = ENV.fetch("EVENTS_API_URL", "http://localhost:4000")
+class Event < ApplicationRecord
+  belongs_to :account
+  has_many :client_application_events, dependent: :destroy
+  has_many :client_applications, through: :client_application_events
+  has_many :properties, dependent: :destroy
+  has_many :property_values, dependent: :destroy
+  has_many :properties, through: :property_values
 
-  # Define the fields accessible by the model
-  schema do
-    string "event_name"
-    datetime "datetime"
-    string "client_application_id"
-  end
+  validates :client_timestamp, presence: :true
 end

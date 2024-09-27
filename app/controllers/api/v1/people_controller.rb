@@ -10,17 +10,12 @@ class Api::V1::PeopleController < ApplicationController
       return
     end
 
-    unless params[:traits].is_a?(ActionController::Parameters) && params[:traits].present?
-      render json: { error: "Traits must be a non-empty hash" }, status: :bad_request
-      return
-    end
-
     permitted_traits = params[:traits].permit!
 
     person = {
-      user_id: params[:user_id],
+      client_user_id: params[:user_id],
       traits: permitted_traits.to_h,
-      timestamp: params[:timestamp],
+      client_timestamp: params[:timestamp],
       application_id: params[:application_id]
     }
 

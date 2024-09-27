@@ -6,5 +6,6 @@ class CreateClientApplicationPeople < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
+    add_index :client_application_people, [ :client_application_id, :person_id ]
   end
 end

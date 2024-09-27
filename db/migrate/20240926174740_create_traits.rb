@@ -8,6 +8,6 @@ class CreateTraits < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    add_index :traits, :is_active
+    add_index :traits, [ :account_id, :is_active ]
   end
 end

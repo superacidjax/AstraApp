@@ -33,7 +33,7 @@ class RuleTest < ActiveSupport::TestCase
   end
 
   test "should save rule with duplicate name in different accounts" do
-    different_account = accounts(:two) # Assuming you have a fixture named `two` for the Account model
+    different_account = accounts(:two)
     rule_with_duplicate_name = Rule.new(account: different_account, name: @rule.name)
     assert rule_with_duplicate_name.save, "Did not save the rule with a duplicate name in a different account"
   end

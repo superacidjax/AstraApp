@@ -7,5 +7,6 @@ class CreateTraitValues < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
+    add_index :trait_values, [ :trait_id, :person_id, :data ]
   end
 end

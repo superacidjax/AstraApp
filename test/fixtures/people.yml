@@ -1,7 +1,8 @@
 one:
   account: one
   client_user_id: "01923300-3971-742d-b298-85687be09041"
-
+  client_timestamp: "2024-09-27T18:45:17+02:00"
 two:
   account: two
   client_user_id: "01923300-c1fb-7037-b30d-7add845d9f73"
+  client_timestamp: "2024-09-27T18:45:17+02:00"

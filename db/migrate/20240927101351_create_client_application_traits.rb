@@ -6,5 +6,6 @@ class CreateClientApplicationTraits < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
+    add_index :client_application_traits, [ :client_application_id, :trait_id ]
   end
 end
