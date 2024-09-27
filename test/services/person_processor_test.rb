@@ -3,14 +3,14 @@ require "test_helper"
 class PersonProcessorTest < ActiveSupport::TestCase
   setup do
     @person_data = {
-      user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
+      client_user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
       traits: {
         "firstName" => "Brian",
         "lastName" => "Dear",
         "email" => "brian@example.com",
         "current_bmi" => "21"
       },
-      timestamp: "2023-10-25T23:48:46+00:00",
+      client_timestamp: "2023-10-25T23:48:46+00:00",
       application_id: client_applications(:one).id
     }
   end
@@ -24,7 +24,7 @@ class PersonProcessorTest < ActiveSupport::TestCase
       end
     end
 
-    person = Person.find_by(client_user_id: @person_data[:user_id])
+    person = Person.find_by(client_user_id: @person_data[:client_user_id])
     assert person.present?, "Person should be created"
     # Check traits
     traits = person.traits
@@ -48,7 +48,7 @@ class PersonProcessorTest < ActiveSupport::TestCase
   end
 
   test "should raise an error for missing user_id" do
-    @person_data.delete(:user_id)
+    @person_data.delete(:client_user_id)
 
     assert_no_difference -> { Person.count } do
       assert_raises(ArgumentError, "Missing required parameters: user_id") do

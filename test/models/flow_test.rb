@@ -33,7 +33,7 @@ class FlowTest < ActiveSupport::TestCase
   end
 
   test "should save flow with duplicate name in different accounts" do
-    different_account = accounts(:two) # Assuming you have a fixture named `two` for the Account model
+    different_account = accounts(:two)
     flow_with_duplicate_name = Flow.new(account: different_account, name: @flow.name)
     assert flow_with_duplicate_name.save, "Did not save the flow with a duplicate name in a different account"
   end

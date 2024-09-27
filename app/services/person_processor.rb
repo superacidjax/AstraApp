@@ -2,9 +2,12 @@ class PersonProcessor
   extend TypeInference
 
   def self.call(person_data)
-    raise ArgumentError, "Missing required parameters: user_id" if person_data[:user_id].blank?
+    raise ArgumentError, "Missing required parameters: client_user_id" if person_data[:client_user_id].blank?
 
-    person = Person.find_or_create_by(client_user_id: person_data[:user_id]) do |p|
+    person = Person.find_or_create_by(
+      client_user_id: person_data[:client_user_id]
+    ) do |p|
+      p.client_timestamp = person_data[:client_timestamp]
       p.account_id = ClientApplication.find(person_data[:application_id]).account_id
     end
 

@@ -2,7 +2,7 @@ require "test_helper"
 
 class TraitValueTest < ActiveSupport::TestCase
   setup do
-    @trait_value = trait_values(:one) # Assuming you have a fixture named :one for trait_values
+    @trait_value = trait_values(:one)
   end
 
   test "fixture trait_value should be valid" do

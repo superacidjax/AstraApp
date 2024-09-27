@@ -4,14 +4,14 @@ require "minitest/mock"
 class PersonProcessorJobTest < ActiveJob::TestCase
   setup do
     @person_data = {
-      user_id: "0192336a-e2b0-7eac-a76b-45f42c34089d",
+      client_user_id: "0192336a-e2b0-7eac-a76b-45f42c34089d",
       traits: {
         "firstName" => "John",
         "lastName" => "Doe",
         "email" => "john.doe@example.com",
         "current_bmi" => "22.5"
       },
-      timestamp: "2023-10-25T23:48:46+00:00",
+      client_timestamp: "2023-10-25T23:48:46+00:00",
       application_id: client_applications(:one).id
     }
   end
