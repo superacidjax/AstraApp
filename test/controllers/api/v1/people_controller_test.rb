@@ -3,15 +3,17 @@ require "test_helper"
 class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
   setup do
     @valid_person = {
-      user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
-      traits: {
-        "firstName" => "Brian",
-        "lastName" => "Dear",
-        "email" => "brian@example.com",
-        "current_bmi" => "21"
-      },
-      timestamp: "2023-10-25T23:48:46+00:00",
-      application_id: client_applications(:one).id
+      person: {
+        user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
+        traits: {
+          "firstName" => "Brian",
+          "lastName" => "Dear",
+          "email" => "brian@example.com",
+          "current_bmi" => "21"
+        },
+        timestamp: "2023-10-25T23:48:46+00:00",
+        application_id: client_applications(:one).id
+      }
     }
   end
 
@@ -27,15 +29,15 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
 
     response_data = JSON.parse(response.body)
-    assert_equal @valid_person[:user_id], response_data["client_user_id"]
-    assert_equal @valid_person[:traits], response_data["traits"]
-    assert_equal @valid_person[:timestamp], response_data["client_timestamp"]
-    assert_equal @valid_person[:application_id], response_data["application_id"]
+    assert_equal @valid_person[:person][:user_id], response_data["client_user_id"]
+    assert_equal @valid_person[:person][:traits], response_data["traits"]
+    assert_equal @valid_person[:person][:timestamp], response_data["client_timestamp"]
+    assert_equal @valid_person[:person][:application_id], response_data["application_id"]
 
-    person = Person.find_by(client_user_id: @valid_person[:user_id])
+    person = Person.find_by(client_user_id: @valid_person[:person][:user_id])
     assert_not_nil person
 
-    @valid_person[:traits].each do |trait_name, trait_value|
+    @valid_person[:person][:traits].each do |trait_name, trait_value|
       trait = Trait.find_by(name: trait_name, account_id: person.account_id)
       assert_not_nil trait, "Trait #{trait_name} should exist"
       trait_value_record = TraitValue.find_by(trait_id: trait.id, person_id: person.id)
@@ -46,7 +48,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should return bad request if user_id is missing" do
     invalid_person = @valid_person.dup
-    invalid_person.delete(:user_id)
+    invalid_person[:person].delete(:user_id)
 
     post api_v1_people_url, params: invalid_person, as: :json, headers: { Authorization: basic_auth_header }
 
@@ -57,7 +59,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should return bad request if traits are missing" do
     invalid_person = @valid_person.dup
-    invalid_person.delete(:traits)
+    invalid_person[:person].delete(:traits)
 
     post api_v1_people_url, params: invalid_person, as: :json, headers: { Authorization: basic_auth_header }
 
@@ -68,7 +70,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should return bad request if timestamp is missing" do
     invalid_person = @valid_person.dup
-    invalid_person.delete(:timestamp)
+    invalid_person[:person].delete(:timestamp)
 
     post api_v1_people_url, params: invalid_person, as: :json, headers: { Authorization: basic_auth_header }
 
@@ -79,7 +81,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
 
   test "should return bad request if application_id is missing" do
     invalid_person = @valid_person.dup
-    invalid_person.delete(:application_id)
+    invalid_person[:person].delete(:application_id)
 
     post api_v1_people_url, params: invalid_person, as: :json, headers: { Authorization: basic_auth_header }
 
