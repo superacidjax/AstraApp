@@ -1,6 +1,4 @@
-class Api::V1::PeopleController < ApplicationController
-  before_action :authenticate
-
+class Api::V1::PeopleController < Api::V1::ApiController
   def create
     required_params = %w[ user_id traits timestamp application_id ]
     missing_params = required_params.select { |param| params[param].blank? }
@@ -9,6 +7,12 @@ class Api::V1::PeopleController < ApplicationController
       render json: { error: "Missing required parameters: #{missing_params.join(', ')}" }, status: :bad_request
       return
     end
+
+    unless valid_iso8601_timestamp?(params[:timestamp])
+      render json: { error: "Invalid timestamp format. It must be in ISO8601 format." }, status: :bad_request
+      return
+    end
+
 
     permitted_traits = params[:traits].permit!
 

@@ -1,5 +1,4 @@
-class Api::V1::EventsController < ApplicationController
-  before_action :authenticate
+class Api::V1::EventsController < Api::V1::ApiController
 
   def create
     required_params = %w[ user_id application_id timestamp properties ]
@@ -27,14 +26,5 @@ class Api::V1::EventsController < ApplicationController
 
     EventProcessorJob.perform_later(event)
     render json: event, status: :created
-  end
-
-  private
-
-  def valid_iso8601_timestamp?(timestamp)
-    DateTime.iso8601(timestamp)
-    true
-  rescue ArgumentError
-    false
   end
 end
