@@ -20,5 +20,4 @@ class Api::V1::ApiController < ApplicationController
   rescue ArgumentError
     false
   end
-
 end

@@ -1,5 +1,4 @@
 class Api::V1::EventsController < Api::V1::ApiController
-
   def create
     required_params = %w[ user_id application_id timestamp properties ]
     missing_params = required_params.select { |param| params[param].blank? }
