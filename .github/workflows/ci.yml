@@ -86,7 +86,7 @@ jobs:
           bundler-cache: true
       
       - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v3.0.0
+        uses: paambaati/codeclimate-action@v5.0.0
         env:
           CC_TEST_REPORTER_ID: 45df97be132ac6a56232fcd06fe4437132133a7a0c8679473a58780a92f19b81
           RAILS_ENV: test
