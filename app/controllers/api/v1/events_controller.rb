@@ -1,6 +1,6 @@
 class Api::V1::EventsController < Api::V1::ApiController
   def create
-    required_params = %w[ user_id application_id timestamp properties ]
+    required_params = %w[ name user_id application_id timestamp properties ]
     missing_params = required_params.select { |param| params[:event][param].blank? }
 
     if missing_params.any?
@@ -16,7 +16,7 @@ class Api::V1::EventsController < Api::V1::ApiController
     permitted_properties = params[:event][:properties].permit!
 
     event = {
-      name: params[:event][:event_name],
+      name: params[:event][:name],
       client_user_id: params[:event][:user_id],
       application_id: params[:event][:application_id],
       client_timestamp: params[:event][:timestamp],

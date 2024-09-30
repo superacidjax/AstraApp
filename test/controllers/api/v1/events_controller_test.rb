@@ -5,7 +5,7 @@ class Api::V1::EventsControllerTest < ActionDispatch::IntegrationTest
     @valid_event = {
       event: {
         user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
-        event_name: "newSubscription",
+        name: "newSubscription",
         application_id: client_applications(:one).id,
         timestamp: "2023-10-05T14:48:00Z",
         properties: {
@@ -22,6 +22,7 @@ class Api::V1::EventsControllerTest < ActionDispatch::IntegrationTest
 
     response_data = JSON.parse(response.body)
     assert_equal @valid_event[:event][:user_id], response_data["client_user_id"]
+    assert_equal @valid_event[:event][:name], response_data["name"]
     assert_equal @valid_event[:event][:application_id], response_data["application_id"]
     assert_equal @valid_event[:event][:timestamp], response_data["client_timestamp"]
     assert_equal @valid_event[:event][:properties], response_data["properties"]
