@@ -25,7 +25,7 @@ group :development, :test do
 end
 
 group :production do
-  # gem "skylight"
+  gem "skylight"
   gem "sentry-ruby"
   gem "sentry-rails"
 end
