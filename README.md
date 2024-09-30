@@ -3,6 +3,12 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/24eb9986d0a40b0bdd68/maintainability)](https://codeclimate.com/repos/66d7811021f4ae08d9f516f0/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/24eb9986d0a40b0bdd68/test_coverage)](https://codeclimate.com/repos/66d7811021f4ae08d9f516f0/test_coverage)
 
+### Performance
+[![View performance data on Skylight](https://badges.skylight.io/problem/72WYVhQRGRCi.svg?token=WyNqxdbP3ACgjMVS-oG9dTdSTXexy2TaKYiySANtm6k)](https://www.skylight.io/app/applications/72WYVhQRGRCi)
+[![View performance data on Skylight](https://badges.skylight.io/typical/72WYVhQRGRCi.svg?token=WyNqxdbP3ACgjMVS-oG9dTdSTXexy2TaKYiySANtm6k)](https://www.skylight.io/app/applications/72WYVhQRGRCi)
+[![View performance data on Skylight](https://badges.skylight.io/rpm/72WYVhQRGRCi.svg?token=WyNqxdbP3ACgjMVS-oG9dTdSTXexy2TaKYiySANtm6k)](https://www.skylight.io/app/applications/72WYVhQRGRCi)
+[![View performance data on Skylight](https://badges.skylight.io/status/72WYVhQRGRCi.svg?token=WyNqxdbP3ACgjMVS-oG9dTdSTXexy2TaKYiySANtm6k)](https://www.skylight.io/app/applications/72WYVhQRGRCi)
+
 ## Introduction
 This is the main application for AstraGoal. This is the application with which end users will interact. The databases for this application is the "source of truth."
 
