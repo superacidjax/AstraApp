@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   get "static_pages/home"
   root "static_pages#home"
 
+  # Good Job Dashboard
+  mount GoodJob::Engine => "good_job"
+
   # health check
   get "up" => "rails/health#show", as: :rails_health_check
 
