@@ -2,73 +2,80 @@ class EventProcessor
   extend TypeInference
 
   def self.call(event_data)
+    validate_event_data!(event_data)
+    event = create_event(event_data)
+    client_application = find_client_application(event_data[:application_id])
+    process_properties(event, event_data[:properties], client_application)
+  end
+
+  private
+
+  def self.validate_event_data!(event_data)
     raise ArgumentError, "Missing required parameters: client_user_id" if event_data[:client_user_id].blank?
     raise ArgumentError, "Missing required parameters: properties" if event_data[:properties].blank?
     raise ArgumentError, "Missing required parameters: application_id" if event_data[:application_id].blank?
+  end
 
-    # Create the event
-    event = Event.create!(
+  def self.create_event(event_data)
+    Event.create!(
       name: event_data[:name],
       client_timestamp: event_data[:client_timestamp].to_time,
       client_user_id: event_data[:client_user_id],
       client_application_id: event_data[:application_id]
     )
+  end
 
-    client_application = ClientApplication.find(event_data[:application_id])
+  def self.find_client_application(application_id)
+    ClientApplication.find(application_id)
+  end
+
+  def self.process_properties(event, properties_data, client_application)
     account_id = client_application.account_id
 
-    # Preload all properties to minimize database queries
-    property_names = event_data[:properties].keys
-    existing_properties = Property.where(name: property_names, account_id: account_id).index_by(&:name)
+    # Preload existing properties
+    property_names = properties_data.keys
+    existing_properties = preload_existing_properties(property_names, account_id)
 
-    new_properties = []
     property_values = []
 
-    event_data[:properties].each do |property_name, property_value|
+    properties_data.each do |property_name, property_value|
       inferred_type = infer_type(property_value)
 
-      # Find or build property in memory to reduce DB calls
+      # Get existing property or build a new one
       property = existing_properties[property_name] || Property.new(
         name: property_name,
         account_id: account_id,
         value_type: inferred_type
       )
 
-      # Only add the property to new_properties if it's a new record
       if property.new_record?
-        new_properties << property
+        property.save!
         existing_properties[property_name] = property
       end
+
+      # Prepare property values for bulk insert
+      property_values << build_property_value(property, event, property_value)
     end
 
-    # Save all new properties to get their IDs
-    Property.import(new_properties) unless new_properties.empty?
+    # Insert property values
+    insert_property_values(property_values)
+  end
 
-    # Reload new_properties to ensure we have IDs after import
-    if new_properties.any?
-      saved_properties = Property.where(id: new_properties.map(&:id)).index_by(&:name)
-      existing_properties.merge!(saved_properties)
-    end
+  def self.preload_existing_properties(property_names, account_id)
+    Property.where(name: property_names, account_id: account_id).index_by(&:name)
+  end
 
-    # Prepare property value data for bulk insertion
-    event_data[:properties].each do |property_name, property_value|
-      property = existing_properties[property_name]
+  def self.build_property_value(property, event, property_value)
+    {
+      property_id: property.id,
+      event_id: event.id,
+      data: property_value,
+      created_at: Time.now,
+      updated_at: Time.now
+    }
+  end
 
-      property_values << {
-        property_id: property.id,
-        event_id: event.id,
-        data: property_value,
-        created_at: Time.now,
-        updated_at: Time.now
-      }
-    end
-
-    # Bulk insert property values
-    PropertyValue.insert_all(property_values)
-
-    # Ensure property-client_application relationship exists, avoid N+1 queries
-    new_properties.each do |property|
-      property.client_applications << client_application unless property.client_applications.include?(client_application)
-    end
+  def self.insert_property_values(property_values)
+    PropertyValue.insert_all!(property_values) unless property_values.empty?
   end
 end
