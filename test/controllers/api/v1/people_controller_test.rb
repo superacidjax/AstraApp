@@ -97,6 +97,18 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # New test to validate ISO8601 timestamp check
+  test "should return bad request for invalid ISO8601 timestamp format" do
+    invalid_person = @valid_person.dup
+    invalid_person[:person][:timestamp] = "invalid-timestamp"
+
+    post api_v1_people_url, params: invalid_person, as: :json, headers: { Authorization: basic_auth_header }
+
+    assert_response :bad_request
+    response_data = JSON.parse(response.body)
+    assert_equal "Invalid timestamp format. It must be in ISO8601 format.", response_data["error"]
+  end
+
   private
 
   def basic_auth_header

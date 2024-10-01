@@ -14,6 +14,13 @@ class GoalTest < ActiveSupport::TestCase
     assert @goal.valid?, "Fixture goal is not valid"
   end
 
+  test "should have validation error on name when name is missing" do
+    goal = Goal.new(name: "")
+    assert goal.invalid?, "Goal without a name should be invalid"
+    assert goal.errors[:name].any?, "There should be an error for the name"
+  end
+
+
   test "should have validation error on success_rate when success_rate is missing" do
     goal = Goal.new(success_rate: nil)
     assert goal.invalid?, "Goal without a success_rate should be invalid"

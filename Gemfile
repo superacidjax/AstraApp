@@ -17,6 +17,7 @@ gem "activeresource"
 gem "uuid7"
 gem "ostruct"
 gem "good_job"
+gem "activerecord-import"
 
 group :development, :test do
   gem "pry-rails"
@@ -25,7 +26,7 @@ group :development, :test do
 end
 
 group :production do
-  gem "skylight"
+  gem "stackprof"
   gem "sentry-ruby"
   gem "sentry-rails"
 end

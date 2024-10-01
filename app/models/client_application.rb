@@ -1,5 +1,6 @@
 class ClientApplication < ApplicationRecord
   belongs_to :account
+  has_many :events, dependent: :destroy
   has_many :client_application_people, dependent: :destroy
   has_many :people
   has_many :people, through: :client_application_people
