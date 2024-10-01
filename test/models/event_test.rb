@@ -43,9 +43,9 @@ class EventTest < ActiveSupport::TestCase
     assert_respond_to @event, :properties, "Event should have many properties through property_values"
   end
 
-  test "should destroy associated property_values on event destruction" do
+  test "should destroy associated properties  on event destruction" do
     event = events(:one)
-    assert_difference "PropertyValue.count", -event.property_values.count do
+    assert_difference "Property.count", -event.properties.count do
       event.destroy
     end
   end
@@ -55,7 +55,6 @@ class EventTest < ActiveSupport::TestCase
     assert_equal @event.client_application.account, @event.account, "Event should return the correct account"
   end
 
-  # New test scenario to validate the 'account' method behavior
   test "should return the correct account for the event" do
     client_application = client_applications(:one)
     event = Event.new(

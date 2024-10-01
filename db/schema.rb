@@ -258,24 +258,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   end
 
   create_table "properties", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "account_id", null: false
+    t.uuid "event_id", null: false
     t.text "name", null: false
     t.boolean "is_active", default: true, null: false
     t.integer "value_type", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id", "is_active"], name: "index_properties_on_account_id_and_is_active"
-    t.index ["account_id"], name: "index_properties_on_account_id"
+    t.index ["event_id", "is_active"], name: "index_properties_on_event_id_and_is_active"
+    t.index ["event_id"], name: "index_properties_on_event_id"
   end
 
   create_table "property_values", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "event_id", null: false
     t.uuid "property_id", null: false
     t.text "data", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["event_id", "data"], name: "index_property_values_on_event_id_and_event_id_and_data"
-    t.index ["event_id"], name: "index_property_values_on_event_id"
+    t.index ["property_id", "data"], name: "index_property_values_on_property_id_and_data"
     t.index ["property_id"], name: "index_property_values_on_property_id"
   end
 
@@ -339,8 +337,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   add_foreign_key "goal_rules", "rules"
   add_foreign_key "goals", "accounts"
   add_foreign_key "people", "accounts"
-  add_foreign_key "properties", "accounts"
-  add_foreign_key "property_values", "events"
+  add_foreign_key "properties", "events"
   add_foreign_key "property_values", "properties"
   add_foreign_key "rules", "accounts"
   add_foreign_key "trait_values", "people"
