@@ -3,6 +3,7 @@ class Person < ApplicationRecord
   has_many :client_application_people, dependent: :destroy
   has_many :client_applications, through: :client_application_people
   has_many :flows
+  has_many :flow_recipients
   has_many :flows, through: :flow_recipients
   has_many :traits
   has_many :trait_values, dependent: :destroy
