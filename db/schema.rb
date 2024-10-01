@@ -42,16 +42,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
     t.index ["type"], name: "index_actions_on_type"
   end
 
-  create_table "client_application_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "client_application_id", null: false
-    t.uuid "event_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["client_application_id", "event_id"], name: "idx_on_client_application_id_event_id_732fdc1f00"
-    t.index ["client_application_id"], name: "index_client_application_events_on_client_application_id"
-    t.index ["event_id"], name: "index_client_application_events_on_event_id"
-  end
-
   create_table "client_application_people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "person_id", null: false
     t.uuid "client_application_id", null: false
@@ -91,14 +81,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "account_id", null: false
+    t.uuid "client_application_id", null: false
     t.text "name", null: false
     t.string "client_user_id", default: "anonymous", null: false
     t.datetime "client_timestamp", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_events_on_account_id"
-    t.index ["client_user_id", "account_id", "name"], name: "index_events_on_client_user_id_and_account_id_and_name", unique: true
+    t.index ["client_application_id"], name: "index_events_on_client_application_id"
+    t.index ["client_user_id", "client_application_id", "name"], name: "idx_on_client_user_id_client_application_id_name_1286f6f45b"
     t.index ["client_user_id"], name: "index_events_on_client_user_id"
   end
 
@@ -161,6 +151,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   create_table "goals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.decimal "success_rate", default: "0.0", null: false
+    t.text "name", null: false
+    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_goals_on_account_id"
@@ -289,7 +281,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
 
   create_table "rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name", null: false
+    t.text "name", null: false
+    t.jsonb "rule_data", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_rules_on_account_id"
@@ -327,8 +320,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
   add_foreign_key "actions", "accounts"
-  add_foreign_key "client_application_events", "client_applications"
-  add_foreign_key "client_application_events", "events"
   add_foreign_key "client_application_people", "client_applications"
   add_foreign_key "client_application_people", "people"
   add_foreign_key "client_application_properties", "client_applications"
@@ -336,7 +327,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_27_202255) do
   add_foreign_key "client_application_traits", "client_applications"
   add_foreign_key "client_application_traits", "traits"
   add_foreign_key "client_applications", "accounts"
-  add_foreign_key "events", "accounts"
+  add_foreign_key "events", "client_applications"
   add_foreign_key "flow_actions", "actions"
   add_foreign_key "flow_actions", "flows"
   add_foreign_key "flow_goals", "flows"
