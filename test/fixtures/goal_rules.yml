@@ -1,11 +1,9 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
   goal: one
-  rule: one
+  rule_id: 01924ce0-167a-7de3-ac5a-ec96255c11a5
   state: 1
 
 two:
   goal: two
-  rule: two
+  rule_id: 01924ce0-167b-7182-a0e5-946b203bdf56
   state: 1
