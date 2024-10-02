@@ -1,0 +1,29 @@
+nested_group:
+  id: 01924ce0-167b-7dc7-906b-42287ee9fa36
+  account: one
+  name: "Nested Rule Group"
+  data:
+    items:
+      - type: "rule"
+        rule_id: 01924ce0-167a-7de3-ac5a-ec96255c11a5
+        operator: null
+
+main_group:
+  id: 01924ce0-167b-747b-b6a4-37cfee91bf36
+  account: one
+  name: "Main Rule Group"
+  data:
+    items:
+      - type: "rule_group"
+        rule_group_id: 01924ce0-167b-7dc7-906b-42287ee9fa36 # nestedgroup id
+        operator: null
+
+another_nested_group:
+  id: 01924ce0-167b-7188-befe-0624e93f7bdd
+  account: one
+  name: "Another Nested Group"
+
+another_main_group:
+  id: 01924ce0-167b-7934-996b-8d6062316a38
+  account: one
+  name: "Another Main Rule Group"

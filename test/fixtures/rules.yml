@@ -1,9 +1,11 @@
 one:
+  id: 01924ce0-167a-7de3-ac5a-ec96255c11a5
   account: one
-  name: rule One
+  name: ruleOne
   rule_data: someData
 
 two:
+  id: 01924ce0-167b-7182-a0e5-946b203bdf56
   account: two
-  name: rule Two
+  name: ruleTwo
   rule_data: someData
