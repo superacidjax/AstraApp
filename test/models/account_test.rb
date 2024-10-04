@@ -2,7 +2,7 @@ require "test_helper"
 
 class AccountTest < ActiveSupport::TestCase
   setup do
-    @account = accounts(:one)
+    @account = Fabricate(:account)
   end
 
   test "should not save account without name" do

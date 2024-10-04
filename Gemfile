@@ -18,6 +18,7 @@ gem "uuid7"
 gem "ostruct"
 gem "good_job"
 gem "activerecord-import"
+gem "view_components"
 
 group :development, :test do
   gem "pry-rails"
@@ -37,8 +38,8 @@ group :development do
 end
 
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+  gem "fabrication"
   gem "selenium-webdriver"
   gem "simplecov", require: false
   gem "webmock"

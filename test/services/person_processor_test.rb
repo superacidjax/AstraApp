@@ -2,6 +2,7 @@ require "test_helper"
 
 class PersonProcessorTest < ActiveSupport::TestCase
   setup do
+    @client_application = Fabricate(:client_application)
     @person_data = {
       client_user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
       traits: {
@@ -11,7 +12,7 @@ class PersonProcessorTest < ActiveSupport::TestCase
         "current_bmi" => "21"
       },
       client_timestamp: "2023-10-25T23:48:46+00:00",
-      application_id: client_applications(:one).id
+      application_id: @client_application.id
     }
   end
 
@@ -26,14 +27,16 @@ class PersonProcessorTest < ActiveSupport::TestCase
 
     person = Person.find_by(client_user_id: @person_data[:client_user_id])
     assert person.present?, "Person should be created"
-    # Check traits
+
     traits = person.traits
     assert_equal 4, traits.count
     assert_includes traits.map(&:name), "firstName"
     assert_includes traits.map(&:name), "current_bmi"
 
-    # Check trait values
-    trait_value = TraitValue.find_by(person_id: person.id, trait_id: traits.find_by(name: "firstName").id)
+    trait_value = TraitValue.find_by(
+      person_id: person.id,
+      trait_id: traits.find_by(name: "firstName").id
+    )
     assert_equal "Brian", trait_value.data
   end
 

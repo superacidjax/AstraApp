@@ -115,6 +115,7 @@ GEM
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
+    fabrication (2.31.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -329,6 +330,8 @@ GEM
     useragent (0.16.10)
     uuid7 (0.2.0)
       zeitwerk (~> 2.4)
+    view_components (0.1.0)
+      rails
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -361,6 +364,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   capybara
+  fabrication
   good_job
   importmap-rails
   jbuilder
@@ -382,6 +386,7 @@ DEPENDENCIES
   stimulus-rails
   turbo-rails
   uuid7
+  view_components
   web-console
   webmock
 

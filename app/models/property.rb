@@ -4,6 +4,7 @@ class Property < ApplicationRecord
   has_many :client_application_properties, dependent: :destroy
   has_many :client_applications, through: :client_application_properties
   has_many :property_values, dependent: :destroy
+  has_many :rules, as: :ruleable
 
   validates :name, presence: true
   validates_inclusion_of :is_active, in: [ true, false ]

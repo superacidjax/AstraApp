@@ -2,6 +2,7 @@ require "test_helper"
 
 class EventProcessorTest < ActiveSupport::TestCase
   setup do
+    @client_application = Fabricate(:client_application)
     @event_data = {
       client_user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
       name: "New sign up",
@@ -10,7 +11,7 @@ class EventProcessorTest < ActiveSupport::TestCase
         "subscription_value" => "930"
       },
       client_timestamp: "2023-10-25T23:48:46+00:00",
-      application_id: client_applications(:one).id
+      application_id: @client_application.id
     }
   end
 
@@ -26,7 +27,7 @@ class EventProcessorTest < ActiveSupport::TestCase
     event = Event.find_by(client_user_id: @event_data[:client_user_id])
     assert_not_nil event, "Event should be created"
     assert_equal event.client_timestamp, @event_data[:client_timestamp].to_time, "Timestamp should match"
-    assert_equal event.client_application.account_id, ClientApplication.find(@event_data[:application_id]).account_id, "Account should match"
+    assert_equal event.client_application.account_id, @client_application.account_id, "Account should match"
 
     properties = event.properties.map(&:name)
     assert_includes properties, "subscription_type", "Event should have subscription_type property"

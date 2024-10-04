@@ -20,6 +20,8 @@ module AstraApp
 
     config.generators do |generate|
       generate.orm :active_record, primary_key_type: :uuid
+      generate.test_framework      :minitest, fixture_replacement: :fabrication
+      generate.fixture_replacement :fabrication, dir: "test/fabricators"
     end
 
     # Configuration for the application, engines, and railties goes here.

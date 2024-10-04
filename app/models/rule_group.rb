@@ -7,6 +7,9 @@ class RuleGroup < ApplicationRecord
     class_name: "RuleGroupMembership", dependent: :destroy
   has_many :child_groups, through: :rule_group_memberships, source: :child_group
 
+  accepts_nested_attributes_for :rule_group_rules, allow_destroy: true
+  accepts_nested_attributes_for :rule_group_memberships, allow_destroy: true
+
   validates :name, presence: true
   validate :must_have_rule_or_group
 

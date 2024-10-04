@@ -2,6 +2,7 @@ require "test_helper"
 
 class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @client_application = Fabricate(:client_application)
     @valid_person = {
       person: {
         user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
@@ -12,7 +13,7 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
           "current_bmi" => "21"
         },
         timestamp: "2023-10-25T23:48:46+00:00",
-        application_id: client_applications(:one).id
+        application_id: @client_application.id
       }
     }
   end
@@ -97,7 +98,6 @@ class Api::V1::PeopleControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # New test to validate ISO8601 timestamp check
   test "should return bad request for invalid ISO8601 timestamp format" do
     invalid_person = @valid_person.dup
     invalid_person[:person][:timestamp] = "invalid-timestamp"

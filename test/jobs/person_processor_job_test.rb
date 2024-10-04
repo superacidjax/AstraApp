@@ -3,6 +3,7 @@ require "minitest/mock"
 
 class PersonProcessorJobTest < ActiveJob::TestCase
   setup do
+    @client_application = Fabricate(:client_application)
     @person_data = {
       client_user_id: "0192336a-e2b0-7eac-a76b-45f42c34089d",
       traits: {
@@ -12,7 +13,7 @@ class PersonProcessorJobTest < ActiveJob::TestCase
         "current_bmi" => "22.5"
       },
       client_timestamp: "2023-10-25T23:48:46+00:00",
-      application_id: client_applications(:one).id
+      application_id: @client_application.id
     }
   end
 

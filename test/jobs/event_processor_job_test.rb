@@ -3,6 +3,7 @@ require "minitest/mock"
 
 class EventProcessorJobTest < ActiveJob::TestCase
   setup do
+    @client_application = Fabricate(:client_application)
     @event_data = {
       client_user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
       name: "New sign up",
@@ -11,7 +12,7 @@ class EventProcessorJobTest < ActiveJob::TestCase
         "subscription_value" => "930"
       },
       client_timestamp: "2023-10-25T23:48:46+00:00",
-      application_id: client_applications(:one).id
+      application_id: @client_application.id
     }
   end
 
