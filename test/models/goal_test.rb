@@ -10,6 +10,23 @@ class GoalTest < ActiveSupport::TestCase
     @property_rule2 = Fabricate(:property_rule, account: @account)
   end
 
+  def numeric_trait
+    @numeric_trait ||= Fabricate(:trait, account: @account, value_type: "numeric")
+  end
+
+  def text_trait
+    @text_trait ||= Fabricate(:trait, account: @account, value_type: "text")
+  end
+
+  def boolean_trait
+    @boolean_trait ||= Fabricate(:trait, account: @account, value_type: "boolean")
+  end
+
+  def datetime_trait
+    @datetime_trait ||= Fabricate(:trait, account: @account, value_type: "datetime")
+  end
+
+
   test "fixture goal should be valid" do
     goal = Fabricate.build(:goal, data: valid_goal_data)
     assert goal.valid?, "Fixture goal is not valid"
@@ -264,6 +281,40 @@ class GoalTest < ActiveSupport::TestCase
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid if 'items' in rule group is not an array"
     assert_includes goal.errors[:data], "initial_state: Rule group items must be an array.", "Error should include 'Rule group items must be an array' for rule group"
+  end
+
+  test "should be invalid with invalid operator for numeric, text, boolean, and datetime" do
+    invalid_operator_data = {
+      "initial_state" => {
+        "items" => [
+          {
+            "type" => "rule",
+            "rule_id" => @trait_rule1.id,
+            "operator" => "INVALID_OP" # Invalid operator for numeric, text, boolean, or datetime
+          }
+        ]
+      }
+    }.to_json
+
+    # Test for numeric trait
+    Fabricate(:trait_rule, account: @account, value: "100")
+    goal_numeric = Fabricate.build(:goal, data: invalid_operator_data)
+    assert_not goal_numeric.valid?, "Goal with numeric trait should be invalid with invalid operator"
+
+    # Test for text trait
+    Fabricate(:trait_rule, account: @account, value: "text")
+    goal_text = Fabricate.build(:goal, data: invalid_operator_data)
+    assert_not goal_text.valid?, "Goal with text trait should be invalid with invalid operator"
+
+    # Test for boolean trait
+    Fabricate(:trait_rule, account: @account, value: "true")
+    goal_boolean = Fabricate.build(:goal, data: invalid_operator_data)
+    assert_not goal_boolean.valid?, "Goal with boolean trait should be invalid with invalid operator"
+
+    # Test for datetime trait
+    Fabricate(:trait_rule, account: @account, value: Time.now)
+    goal_datetime = Fabricate.build(:goal, data: invalid_operator_data)
+    assert_not goal_datetime.valid?, "Goal with datetime trait should be invalid with invalid operator"
   end
 
   private
