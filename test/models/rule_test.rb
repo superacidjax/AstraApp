@@ -210,4 +210,123 @@ class RuleTest < ActiveSupport::TestCase
     assert rule.valid?, "Event rule with datetime 'within range' operator should be valid"
     assert rule.save, "Failed to save a valid datetime event rule with within range operator"
   end
+
+  # Missing operator
+  test "should be invalid without an operator" do
+    rule.ruleable = numeric_trait
+    rule.data = { value: 30 }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without an operator"
+    assert_includes rule.errors[:data], "Missing operator in data"
+  end
+
+  # Invalid operator for numeric
+  test "should be invalid with invalid numeric operator" do
+    rule.ruleable = numeric_trait
+    rule.operator = "InvalidOperator"
+    rule.value = 30
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid numeric operator"
+    assert_includes rule.errors[:operator], "Invalid numeric operator 'InvalidOperator'"
+  end
+
+  # Invalid operator for text
+  test "should be invalid with invalid text operator" do
+    rule.ruleable = text_trait
+    rule.operator = "InvalidOperator"
+    rule.value = "Some Text"
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid text operator"
+    assert_includes rule.errors[:operator], "Invalid text operator 'InvalidOperator'"
+  end
+
+  # Invalid operator for boolean
+  test "should be invalid with invalid boolean operator" do
+    rule.ruleable = boolean_trait
+    rule.operator = "InvalidOperator"
+    rule.value = true
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid boolean operator"
+    assert_includes rule.errors[:operator], "Invalid boolean operator 'InvalidOperator'"
+  end
+
+  # Invalid operator for datetime
+  test "should be invalid with invalid datetime operator" do
+    rule.ruleable = datetime_trait
+    rule.operator = "InvalidOperator"
+    rule.value = "2023-10-25T23:48:46+00:00"
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid datetime operator"
+    assert_includes rule.errors[:operator], "Invalid datetime operator 'InvalidOperator'"
+  end
+
+  # Missing numeric value
+  test "should be invalid without numeric value for Greater than operator" do
+    rule.ruleable = numeric_trait
+    rule.operator = "Greater than"
+    rule.data = { operator: rule.operator }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without numeric value"
+    assert_includes rule.errors[:value], "Numeric value must be present for Greater than"
+  end
+
+  # Invalid range without from and to for numeric
+  test "should be invalid without from and to for numeric within range operator" do
+    rule.ruleable = numeric_trait
+    rule.operator = "Within range"
+    rule.inclusive = true
+    rule.data = { operator: rule.operator, inclusive: rule.inclusive }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without from and to for within range"
+    assert_includes rule.errors[:from], "'from' and 'to' must be numeric for within range operator"
+  end
+
+  # Invalid ISO8601 datetime
+  test "should be invalid with invalid datetime format for before operator" do
+    rule.ruleable = datetime_trait
+    rule.operator = "Before"
+    rule.value = "invalid-datetime"
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid datetime format"
+    assert_includes rule.errors[:value], "Value must be a valid ISO8601 datetime string"
+  end
+
+  # Invalid case_sensitive for text rule
+  test "should be invalid with invalid case_sensitive value for text rule" do
+    rule.ruleable = text_trait
+    rule.operator = "Equals"
+    rule.value = "Some Text"
+    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: "invalid" }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid case_sensitive"
+    assert_includes rule.errors[:case_sensitive], "case_sensitive must be true or false"
+  end
+
+  # Invalid inclusive value for range operator
+  test "should be invalid with invalid inclusive value for within range operator" do
+    rule.ruleable = numeric_trait
+    rule.operator = "Within range"
+    rule.from = 20
+    rule.to = 30
+    rule.inclusive = nil
+    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with invalid inclusive value"
+    assert_includes rule.errors[:inclusive], "'inclusive' key must be true or false for within range operator"
+  end
+
+  test "should be invalid with unknown ruleable type" do
+    rule.ruleable_type = "Account"
+    rule.operator = "Equals"
+    rule.value = "Some Value"
+    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with unknown ruleable type"
+    assert_includes rule.errors[:ruleable_type], "Unknown ruleable type"
+  end
 end

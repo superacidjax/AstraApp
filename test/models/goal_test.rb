@@ -189,6 +189,83 @@ class GoalTest < ActiveSupport::TestCase
     assert_includes goal.errors[:data], "initial_state: Invalid item type 'invalid_type'."
   end
 
+  test "should be invalid with malformed JSON data" do
+    invalid_json_data = "invalid_json_data"
+
+    goal = Fabricate.build(:goal, data: invalid_json_data)
+    assert_not goal.valid?, "Goal should be invalid with malformed JSON data"
+    assert_includes goal.errors[:data], "must be valid JSON", "Error should include 'must be valid JSON'"
+  end
+
+  test "should be invalid if items is not an array in initial_state" do
+    invalid_data = {
+      "initial_state" => {
+        "items" => "invalid_non_array_value"  # 'items' should be an array, but here it's a string
+      },
+      "end_state" => {
+        "items" => [
+          {
+            "type" => "rule",
+            "rule_id" => @trait_rule1.id,
+            "operator" => nil
+          }
+        ]
+      }
+    }.to_json
+
+    goal = Fabricate.build(:goal, data: invalid_data)
+    assert_not goal.valid?, "Goal should be invalid if 'items' is not an array in initial_state"
+    assert_includes goal.errors[:data], "initial_state: Items must be an array", "Error should include 'Items must be an array' for initial_state"
+  end
+
+  test "should be invalid if items array is empty in initial_state" do
+    invalid_data = {
+      "initial_state" => {
+        "items" => []  # 'items' is an empty array
+      },
+      "end_state" => {
+        "items" => [
+          {
+            "type" => "rule",
+            "rule_id" => @trait_rule1.id,
+            "operator" => nil
+          }
+        ]
+      }
+    }.to_json
+
+    goal = Fabricate.build(:goal, data: invalid_data)
+    assert_not goal.valid?, "Goal should be invalid if 'items' array is empty in initial_state"
+    assert_includes goal.errors[:data], "initial_state: Must contain at least one item.", "Error should include 'Must contain at least one item' for initial_state"
+  end
+
+  test "should be invalid if rule group items is not an array" do
+    invalid_data = {
+      "initial_state" => {
+        "items" => [
+          {
+            "type" => "rule_group",
+            "operator" => "AND",
+            "items" => "not_an_array"  # 'items' is not an array here
+          }
+        ]
+      },
+      "end_state" => {
+        "items" => [
+          {
+            "type" => "rule",
+            "rule_id" => @trait_rule1.id,
+            "operator" => nil
+          }
+        ]
+      }
+    }.to_json
+
+    goal = Fabricate.build(:goal, data: invalid_data)
+    assert_not goal.valid?, "Goal should be invalid if 'items' in rule group is not an array"
+    assert_includes goal.errors[:data], "initial_state: Rule group items must be an array.", "Error should include 'Rule group items must be an array' for rule group"
+  end
+
   private
 
   def valid_goal_data
