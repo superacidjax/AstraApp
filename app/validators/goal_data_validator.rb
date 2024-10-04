@@ -10,36 +10,48 @@ class GoalDataValidator < ActiveModel::Validator
     end
 
     %w[initial_state end_state].each do |state_name|
-      state = data[state_name]
-      next unless state
-
-      items = state["items"]
-      unless items.is_a?(Array)
-        record.errors.add(:data, "#{state_name}: Items must be an array")
-        next
-      end
-
-      validate_items(record, items, state_name)
+      validate_state(record, data, state_name)
     end
   end
 
   private
 
+  # Validate the entire state (initial_state or end_state)
+  def validate_state(record, data, state_name)
+    state = data[state_name]
+    return unless state
+
+    items = state["items"]
+    unless items.is_a?(Array)
+      record.errors.add(:data, "#{state_name}: Items must be an array")
+      return
+    end
+
+    validate_items(record, items, state_name)
+  end
+
+  # Validate the list of items within a state or rule group
   def validate_items(record, items, context)
-    if items.length < 1
+    if items.empty?
       record.errors.add(:data, "#{context}: Must contain at least one item.")
       return
     end
 
     items.each_with_index do |item, index|
-      validate_item(record, item, index, items.length, context)
+      validate_item(record, item, index, items, context)
     end
   end
 
-  def validate_item(record, item, index, total_items, context)
-    is_last_item = index == total_items - 1
+  # Validate an individual item (rule or rule group)
+  def validate_item(record, item, index, items, context)
+    is_last_item = index == items.length - 1
 
-    # Validate operator
+    validate_operator(record, item, is_last_item, context)
+    validate_item_type(record, item, context)
+  end
+
+  # Validate the operator for the item
+  def validate_operator(record, item, is_last_item, context)
     if is_last_item
       if item["operator"].present?
         record.errors.add(:data, "#{context}: Operator should not be present on the last item.")
@@ -51,13 +63,13 @@ class GoalDataValidator < ActiveModel::Validator
         record.errors.add(:data, "#{context}: Operator '#{item['operator']}' is not valid. Allowed operators are #{ALLOWED_OPERATORS.join(', ')}.")
       end
     end
+  end
 
-    # Validate item type
+  # Validate the type of the item (rule or rule group)
+  def validate_item_type(record, item, context)
     case item["type"]
     when "rule"
-      if item["rule_id"].blank?
-        record.errors.add(:data, "#{context}: Rule ID is required.")
-      end
+      validate_rule(record, item, context)
     when "rule_group"
       validate_rule_group(record, item, context)
     else
@@ -65,6 +77,14 @@ class GoalDataValidator < ActiveModel::Validator
     end
   end
 
+  # Validate a rule item
+  def validate_rule(record, item, context)
+    if item["rule_id"].blank?
+      record.errors.add(:data, "#{context}: Rule ID is required.")
+    end
+  end
+
+  # Validate a rule group item
   def validate_rule_group(record, item, context)
     items = item["items"]
     unless items.is_a?(Array)
@@ -73,7 +93,7 @@ class GoalDataValidator < ActiveModel::Validator
     end
 
     if items.length < 2
-      record.errors.add(:data, "#{context} -> Rule Group: Rule group must contain at least two items.") # Updated message
+      record.errors.add(:data, "#{context} -> Rule Group: Rule group must contain at least two items.")
     end
 
     validate_items(record, items, "#{context} -> Rule Group")
