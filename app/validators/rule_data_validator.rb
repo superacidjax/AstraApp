@@ -9,8 +9,7 @@ class RuleDataValidator < ActiveModel::Validator
   def validate(record)
     ruleable_type = record.ruleable_type
 
-    case ruleable_type
-    when "Trait", "Property"
+    if %w[Trait Property].include?(ruleable_type)
       validate_rule(record)
     else
       record.errors.add(:ruleable_type, "Unknown ruleable type")
@@ -21,29 +20,26 @@ class RuleDataValidator < ActiveModel::Validator
 
   def validate_rule(record)
     validate_data_structure(record)
-
     value_type = record.ruleable.value_type
     operator = record.operator
 
-    unless ALLOWED_OPERATORS[value_type].include?(operator)
+    unless valid_operator?(value_type, operator)
       record.errors.add(:operator, "Invalid #{value_type} operator '#{operator}'")
       return
     end
 
-    case value_type
-    when "numeric" then validate_numeric_rule(record)
-    when "text" then validate_text_rule(record)
-    when "boolean" then validate_boolean_rule(record)
-    when "datetime" then validate_datetime_rule(record)
-    end
+    send("validate_#{value_type}_rule", record)
+  end
+
+  def valid_operator?(value_type, operator)
+    ALLOWED_OPERATORS[value_type].include?(operator)
   end
 
   def validate_data_structure(record)
-    unless record.data.key?("operator")
-      record.errors.add(:data, "Missing operator in data")
-    end
+    record.errors.add(:data, "Missing operator in data") unless record.data.key?("operator")
   end
 
+  # Numeric rule validation
   def validate_numeric_rule(record)
     if record.operator == "Within range"
       validate_range(record, :numeric)
@@ -52,15 +48,18 @@ class RuleDataValidator < ActiveModel::Validator
     end
   end
 
+  # Text rule validation
   def validate_text_rule(record)
     validate_presence_of_value(record, :text)
     validate_case_sensitivity(record)
   end
 
+  # Boolean rule validation
   def validate_boolean_rule(record)
-    boolean_or_nil(record.value)
+    validate_boolean_value(record)
   end
 
+  # Datetime rule validation
   def validate_datetime_rule(record)
     if record.operator == "Within range"
       validate_range(record, :datetime)
@@ -70,37 +69,51 @@ class RuleDataValidator < ActiveModel::Validator
   end
 
   def validate_presence_of_value(record, value_type)
-    value = record.value
-    case value_type
-    when :numeric
-      value = numeric_or_nil(value)
+    value = case value_type
+    when :numeric then numeric_or_nil(record.value)
+    else record.value
+    end
 
-      unless value.is_a?(Numeric)
-        record.errors.add(:value, "Numeric value must be present for #{record.operator}")
-      end
+    unless value.present?
+      record.errors.add(:value, "#{value_type.capitalize} value must be present for #{record.operator}")
     end
   end
 
   def validate_case_sensitivity(record)
-    if record.data.key?("case_sensitive") && ![ true, false ].include?(record.data["case_sensitive"])
+    return unless record.data.key?("case_sensitive")
+
+    unless [ true, false ].include?(record.data["case_sensitive"])
       record.errors.add(:case_sensitive, "case_sensitive must be true or false")
     end
   end
 
-  def validate_range(record, value_type)
-    numeric_or_nil(record.from) && numeric_or_nil(record.to)
+  def validate_boolean_value(record)
+    value = boolean_or_nil(record.value)
+    unless [ true, false ].include?(value)
+      record.errors.add(:value, "Boolean value must be true or false")
+    end
   end
 
   def validate_range(record, value_type)
-    from, to = numeric_or_nil(record.from), numeric_or_nil(record.to)
+    from, to = cast_range_values(record, value_type)
 
-    case value_type
-    when :numeric
-      unless from.is_a?(Numeric) && to.is_a?(Numeric)
-        record.errors.add(:from, "'from' and 'to' must be numeric for within range operator")
-      end
+    if from.nil? || to.nil?
+      record.errors.add(:from, "'from' and 'to' must be #{value_type} for within range operator")
     end
 
+    validate_inclusive_key(record)
+  end
+
+  def cast_range_values(record, value_type)
+    case value_type
+    when :numeric
+      [ numeric_or_nil(record.from), numeric_or_nil(record.to) ]
+    when :datetime
+      [ valid_iso8601?(record.from), valid_iso8601?(record.to) ]
+    end
+  end
+
+  def validate_inclusive_key(record)
     unless [ true, false ].include?(record.inclusive)
       record.errors.add(:inclusive, "'inclusive' key must be true or false for within range operator")
     end
@@ -112,6 +125,7 @@ class RuleDataValidator < ActiveModel::Validator
     end
   end
 
+  # Helper methods
   def boolean_or_nil(value)
     return true if [ true, "t", "true" ].include?(value)
     return false if [ false, "f", "false" ].include?(value)

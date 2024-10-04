@@ -38,42 +38,61 @@ class GoalDataValidator < ActiveModel::Validator
     end
 
     items.each_with_index do |item, index|
-      validate_item(record, item, index, items, context)
+      validation_context = build_validation_context(record, item, index, items, context)
+      validate_item(validation_context)
     end
   end
 
-  # Validate an individual item (rule or rule group)
-  def validate_item(record, item, index, items, context)
-    is_last_item = index == items.length - 1
+  # Encapsulate all relevant data into a validation context
+  def build_validation_context(record, item, index, items, context)
+    {
+      record: record,
+      item: item,
+      index: index,
+      is_last_item: index == items.length - 1,
+      context: context
+    }
+  end
 
-    validate_operator(record, item, is_last_item, context)
-    validate_item_type(record, item, context)
+  # Validate an individual item (rule or rule group) using the context
+  def validate_item(validation_context)
+    validate_operator(validation_context)
+    validate_item_type(validation_context)
   end
 
   # Validate the operator for the item
-  def validate_operator(record, item, is_last_item, context)
+  def validate_operator(context)
+    item = context[:item]
+    record = context[:record]
+    is_last_item = context[:is_last_item]
+    validation_context = context[:context]
+
     if is_last_item
       if item["operator"].present?
-        record.errors.add(:data, "#{context}: Operator should not be present on the last item.")
+        record.errors.add(:data, "#{validation_context}: Operator should not be present on the last item.")
       end
     else
       if item["operator"].blank?
-        record.errors.add(:data, "#{context}: Operator is required between items.")
+        record.errors.add(:data, "#{validation_context}: Operator is required between items.")
       elsif !ALLOWED_OPERATORS.include?(item["operator"])
-        record.errors.add(:data, "#{context}: Operator '#{item['operator']}' is not valid. Allowed operators are #{ALLOWED_OPERATORS.join(', ')}.")
+        record.errors.add(:data, "#{validation_context}: Operator '#{item['operator']}' is not valid. Allowed operators are #{ALLOWED_OPERATORS.join(', ')}.")
       end
     end
   end
 
   # Validate the type of the item (rule or rule group)
-  def validate_item_type(record, item, context)
+  def validate_item_type(context)
+    item = context[:item]
+    record = context[:record]
+    validation_context = context[:context]
+
     case item["type"]
     when "rule"
-      validate_rule(record, item, context)
+      validate_rule(record, item, validation_context)
     when "rule_group"
-      validate_rule_group(record, item, context)
+      validate_rule_group(record, item, validation_context)
     else
-      record.errors.add(:data, "#{context}: Invalid item type '#{item['type']}'.")
+      record.errors.add(:data, "#{validation_context}: Invalid item type '#{item['type']}'.")
     end
   end
 
