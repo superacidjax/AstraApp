@@ -10,7 +10,7 @@ class GoalDataValidator < ActiveModel::Validator
     end
 
     %w[initial_state end_state].each do |state_name|
-      validate_state(record, data[state_name], state_name) # Simplified call
+      validate_state(record, data[state_name], state_name)
     end
   end
 
@@ -37,16 +37,17 @@ class GoalDataValidator < ActiveModel::Validator
     end
 
     items.each_with_index do |item, index|
-      validate_item(build_validation_context(record, item, index, items.length, context))
+      item_context = { item: item, index: index, total_items: items.length }
+      validate_item(build_validation_context(record, item_context, context))
     end
   end
 
   # Encapsulate all relevant data into a validation context
-  def build_validation_context(record, item, index, total_items, context)
+  def build_validation_context(record, item_context, context)
     OpenStruct.new(
       record: record,
-      item: item,
-      is_last_item: index == total_items - 1,
+      item: item_context[:item],
+      is_last_item: item_context[:index] == item_context[:total_items] - 1,
       context: context
     )
   end
