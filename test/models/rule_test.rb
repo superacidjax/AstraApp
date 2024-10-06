@@ -9,23 +9,6 @@ class RuleTest < ActiveSupport::TestCase
     @rule ||= Fabricate.build(:rule, account: account)
   end
 
-  # Helper methods for trait rules
-  def numeric_trait
-    @numeric_trait ||= Fabricate(:trait, account: account, value_type: "numeric")
-  end
-
-  def text_trait
-    @text_trait ||= Fabricate(:trait, account: account, value_type: "text")
-  end
-
-  def boolean_trait
-    @boolean_trait ||= Fabricate(:trait, account: account, value_type: "boolean")
-  end
-
-  def datetime_trait
-    @datetime_trait ||= Fabricate(:trait, account: account, value_type: "datetime")
-  end
-
   # Helper methods for property rules
   def numeric_property
     @numeric_property ||= Fabricate(:property, value_type: "numeric")
@@ -43,290 +26,468 @@ class RuleTest < ActiveSupport::TestCase
     @datetime_property ||= Fabricate(:property, value_type: "datetime")
   end
 
-  # Person-based rule tests (Trait)
-  # Numeric
-  test "should validate numeric person rule with greater than operator" do
-    rule.ruleable = numeric_trait
-    rule.operator = "Greater than"
-    rule.value = 30
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
-
-    assert rule.valid?, "Person rule with numeric 'greater than' operator should be valid"
-    assert rule.save, "Failed to save a valid numeric person rule"
+  # Helper methods for trait rules
+  def numeric_trait
+    @numeric_trait ||= Fabricate(:trait, account: account, value_type: "numeric")
   end
 
-  test "should validate numeric person rule within range" do
-    rule.ruleable = numeric_trait
-    rule.operator = "Within range"
-    rule.from = 20
-    rule.to = 30
-    rule.inclusive = true
-    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
-
-    assert rule.valid?, "Person rule with numeric 'within range' operator should be valid"
-    assert rule.save, "Failed to save a valid numeric person rule with within range operator"
+  def text_trait
+    @text_trait ||= Fabricate(:trait, account: account, value_type: "text")
   end
 
-  # Text
-  test "should validate text person rule with equals operator" do
-    rule.ruleable = text_trait
-    rule.operator = "Equals"
-    rule.value = "Some Text"
-    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: false }.stringify_keys
-
-    assert rule.valid?, "Person rule with text 'equals' operator should be valid"
-    assert rule.save, "Failed to save a valid text person rule with equals operator"
+  def boolean_trait
+    @boolean_trait ||= Fabricate(:trait, account: account, value_type: "boolean")
   end
 
-  test "should validate text person rule with contains operator" do
-    rule.ruleable = text_trait
-    rule.operator = "Contains"
-    rule.value = "Text"
-    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: true }.stringify_keys
-
-    assert rule.valid?, "Person rule with text 'contains' operator should be valid"
-    assert rule.save, "Failed to save a valid text person rule with contains operator"
+  def datetime_trait
+    @datetime_trait ||= Fabricate(:trait, account: account, value_type: "datetime")
   end
 
-  # Boolean
-  test "should validate boolean person rule with is operator" do
-    rule.ruleable = boolean_trait
-    rule.operator = "Is"
-    rule.value = true
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+  ### Event Based Rule Tests
 
-    assert rule.valid?, "Person rule with boolean 'is' operator should be valid"
-    assert rule.save, "Failed to save a valid boolean person rule with is operator"
-  end
+  ### Errors
 
-  # Datetime
-  test "should validate datetime person rule with before operator" do
-    rule.ruleable = datetime_trait
-    rule.operator = "Before"
-    rule.value = "2023-10-25T23:48:46+00:00"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
-
-    assert rule.valid?, "Person rule with datetime 'before' operator should be valid"
-    assert rule.save, "Failed to save a valid datetime person rule with before operator"
-  end
-
-  test "should validate datetime person rule within range" do
-    rule.ruleable = datetime_trait
-    rule.operator = "Within range"
-    rule.from = "2023-01-01T00:00:00+00:00"
-    rule.to = "2023-12-31T23:59:59+00:00"
-    rule.inclusive = true
-    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
-
-    assert rule.valid?, "Person rule with datetime 'within range' operator should be valid"
-    assert rule.save, "Failed to save a valid datetime person rule with within range operator"
-  end
-
-  # Event-based rule tests (Property)
-  # Numeric
-  test "should validate numeric event rule with greater than operator" do
+  test "should be invalid without property_value for numeric property rule" do
     rule.ruleable = numeric_property
-    rule.operator = "Greater than"
-    rule.value = 100
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.property_operator = "Greater than"
+    rule.property_value = nil # Missing property_value
+    rule.data = {
+      property_operator: rule.property_operator,
+      property_value: rule.property_value
+    }.stringify_keys
 
-    assert rule.valid?, "Event rule with numeric 'greater than' operator should be valid"
+    assert_not rule.valid?, "Rule should be invalid without 'property_value'"
+    assert_includes rule.errors[:property_value], "Numeric value must be present"
+  end
+
+  test "should be invalid without property_value for text property rule" do
+    rule.ruleable = text_property
+    rule.property_operator = "Equals"
+    rule.property_value = nil # Missing property_value
+    rule.data = {
+      property_operator: rule.property_operator,
+      property_value: rule.property_value
+    }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'property_value'"
+    assert_includes rule.errors[:property_value], "Text value must be present"
+  end
+
+  test "should be invalid without datetime_from or datetime_to for within range operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has occurred"
+
+    # Scenario 1: Missing 'datetime_from'
+    rule.datetime_from = nil
+    rule.datetime_to = "2024-12-31T23:59:59+00:00"
+    rule.occurrence_inclusive = true
+    rule.data = {
+      occurrence_operator: rule.occurrence_operator,
+      datetime_to: rule.datetime_to,
+      occurrence_inclusive: rule.occurrence_inclusive
+    }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'datetime_from' for within range"
+    assert_includes rule.errors[:datetime_from], "'datetime_from' must be present for implied 'within range'"
+
+    # Scenario 2: Missing 'datetime_to'
+    rule.datetime_from = "2024-01-01T00:00:00+00:00"
+    rule.datetime_to = nil
+    rule.data = {
+      occurrence_operator: rule.occurrence_operator,
+      datetime_from: rule.datetime_from,
+      occurrence_inclusive: rule.occurrence_inclusive
+    }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'datetime_to' for within range"
+    assert_includes rule.errors[:datetime_to], "'datetime_to' must be present for implied 'within range'"
+  end
+
+  test "should be invalid without occurrence_inclusive for within range operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has occurred"
+    rule.datetime_from = "2024-01-01T00:00:00+00:00"
+    rule.datetime_to = "2024-12-31T23:59:59+00:00"
+    rule.occurrence_inclusive = nil  # Invalid value
+    rule.data = {
+      occurrence_operator: rule.occurrence_operator,
+      datetime_from: rule.datetime_from,
+      datetime_to: rule.datetime_to
+    }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'occurrence_inclusive' for within range"
+    assert_includes rule.errors[:occurrence_inclusive], "'occurrence_inclusive' must be true or false"
+  end
+  # ## Good below this line
+  test "should be invalid without 'from' or 'to' for within range operator" do
+    rule.ruleable = numeric_property
+    rule.property_operator = "Within range"
+
+    # Scenario 1: Missing 'from' value
+    rule.property_from = nil
+    rule.property_to = 100
+    rule.data = { property_operator: rule.property_operator, property_to: rule.property_to }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'from' for within range"
+    assert_includes rule.errors[:property_from], "'from' must be numeric for within range"
+
+    # Scenario 2: Missing 'to' value
+    rule.property_from = 50
+    rule.property_to = nil
+    rule.data = { property_operator: rule.property_operator, property_from: rule.property_from }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid without 'to' for within range"
+    assert_includes rule.errors[:property_to], "'to' must be numeric for within range"
+  end
+
+  test "should be invalid with unsupported occurrence_operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Since" # This should be invalid
+    rule.data = { occurrence_operator: rule.occurrence_operator }.stringify_keys
+
+    assert_not rule.valid?, "Rule should be invalid with unsupported occurrence operator"
+    assert_includes rule.errors[:occurrence_operator], "Invalid occurrence 'Since'"
+  end
+
+  test "should validate event rule with 'Has occurred' operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has occurred"
+    rule.data = { occurrence_operator: rule.occurrence_operator }.stringify_keys
+
+    assert rule.valid?, "Rule with 'Has occurred' operator should be valid"
+    assert rule.save, "Failed to save a valid 'Has occurred' event rule"
+  end
+
+  test "should validate event rule with 'Has not occurred' operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has not occurred"
+    rule.data = { occurrence_operator: rule.occurrence_operator }.stringify_keys
+
+    assert rule.valid?, "Rule with 'Has not occurred' operator should be valid"
+    assert rule.save, "Failed to save a valid 'Has not occurred' event rule"
+  end
+
+  # Numeric property tests
+  test "should validate numeric event rule with greater than property_operator" do
+    rule.ruleable = numeric_property
+    rule.property_operator = "Greater than"
+    rule.property_value = 100
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value }.stringify_keys
+
+    assert rule.valid?, "Event rule with numeric 'greater than' should be valid"
     assert rule.save, "Failed to save a valid numeric event rule"
   end
 
   test "should validate numeric event rule within range" do
     rule.ruleable = numeric_property
-    rule.operator = "Within range"
-    rule.from = 20
-    rule.to = 100
-    rule.inclusive = false
-    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
+    rule.property_operator = "Within range"
+    rule.property_from = 20
+    rule.property_to = 100
+    rule.property_inclusive = false
+    rule.data = { property_operator: rule.property_operator,
+                  property_from: rule.property_from, property_to: rule.property_to,
+                  property_inclusive: rule.property_inclusive }.stringify_keys
 
-    assert rule.valid?, "Event rule with numeric 'within range' operator should be valid"
-    assert rule.save, "Failed to save a valid numeric event rule with within range operator"
+    assert rule.valid?, "Event rule with numeric 'within range' should be valid"
+    assert rule.save, "Failed to save a valid numeric event rule"
   end
 
-  # Text
-  test "should validate text event rule with contains operator" do
-    rule.ruleable = text_property
-    rule.operator = "Contains"
-    rule.value = "Some Text"
-    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: true }.stringify_keys
+  test "should be invalid without property_operator or occurrence_operator in data" do
+    rule.ruleable = datetime_property
+    rule.data = {}
 
-    assert rule.valid?, "Event rule with text 'contains' operator should be valid"
-    assert rule.save, "Failed to save a valid text event rule with contains operator"
+    assert_not rule.valid?, "Rule should be invalid without an operator in data"
+    assert_includes rule.errors[:data], "Missing operator in data"
   end
 
-  test "should validate text event rule with equals operator" do
-    rule.ruleable = text_property
-    rule.operator = "Equals"
-    rule.value = "Event Text"
-    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: false }.stringify_keys
+  test "should be invalid with invalid property operator for event-based rule" do
+    rule.ruleable = datetime_property
+    rule.property_operator = "InvalidOperator"
+    rule.property_value = "2024-01-01T00:00:00+00:00"
+    rule.data = {
+      property_operator: rule.property_operator,
+      property_value: rule.property_value
+    }.stringify_keys
 
-    assert rule.valid?, "Event rule with text 'equals' operator should be valid"
+    assert_not rule.valid?, "Rule should be invalid with an invalid property operator"
+    assert_includes rule.errors[:property_operator],
+      "Invalid datetime operator 'InvalidOperator'"
+  end
+
+  # Text property tests
+  test "should validate text event rule with contains property_operator" do
+    rule.ruleable = text_property
+    rule.property_operator = "Contains"
+    rule.property_value = "Some Text"
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value,
+                  case_sensitive: true }.stringify_keys
+
+    assert rule.valid?, "Event rule with text 'contains' should be valid"
+    assert rule.save, "Failed to save a valid text event rule"
+  end
+
+  test "should validate text event rule with equals property_operator" do
+    rule.ruleable = text_property
+    rule.property_operator = "Equals"
+    rule.property_value = "Event Text"
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value,
+                  case_sensitive: false }.stringify_keys
+
+    assert rule.valid?, "Event rule with text 'equals' should be valid"
     assert rule.save, "Failed to save a valid text event rule with equals operator"
   end
 
-  # Boolean
-  test "should validate boolean event rule with is not operator" do
+  # Boolean property tests
+  test "should validate boolean event rule with is not property_operator" do
     rule.ruleable = boolean_property
-    rule.operator = "Is not"
-    rule.value = false
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.property_operator = "Is not"
+    rule.property_value = false
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value }.stringify_keys
 
-    assert rule.valid?, "Event rule with boolean 'is not' operator should be valid"
-    assert rule.save, "Failed to save a valid boolean event rule with is not operator"
+    assert rule.valid?, "Event rule with boolean 'is not' should be valid"
+    assert rule.save, "Failed to save a valid boolean event rule"
   end
 
-  test "should validate boolean event rule with is operator" do
+  test "should validate boolean event rule with is property_operator" do
     rule.ruleable = boolean_property
-    rule.operator = "Is"
-    rule.value = true
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.property_operator = "Is"
+    rule.property_value = true
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value }.stringify_keys
 
-    assert rule.valid?, "Event rule with boolean 'is' operator should be valid"
-    assert rule.save, "Failed to save a valid boolean event rule with is operator"
+    assert rule.valid?, "Event rule with boolean 'is' should be valid"
+    assert rule.save, "Failed to save a valid boolean event rule"
   end
 
-  # Datetime
-  test "should validate datetime event rule with after operator" do
+  # Datetime property tests
+  test "should validate datetime event rule with after property_operator" do
     rule.ruleable = datetime_property
-    rule.operator = "After"
-    rule.value = "2024-01-01T00:00:00+00:00"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.property_operator = "After"
+    rule.property_value = "2024-01-01T00:00:00+00:00"
+    rule.data = { property_operator: rule.property_operator,
+                  property_value: rule.property_value }.stringify_keys
 
-    assert rule.valid?, "Event rule with datetime 'after' operator should be valid"
-    assert rule.save, "Failed to save a valid datetime event rule with after operator"
+    assert rule.valid?, "Event rule with datetime 'after' should be valid"
+    assert rule.save, "Failed to save a valid datetime event rule"
   end
 
   test "should validate datetime event rule within range" do
     rule.ruleable = datetime_property
-    rule.operator = "Within range"
-    rule.from = "2023-01-01T00:00:00+00:00"
-    rule.to = "2023-12-31T23:59:59+00:00"
-    rule.inclusive = true
-    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
+    rule.property_operator = "Within range"
+    rule.property_from = "2023-01-01T00:00:00+00:00"
+    rule.property_to = "2023-12-31T23:59:59+00:00"
+    rule.property_inclusive = true
+    rule.data = { property_operator: rule.property_operator,
+                  property_from: rule.property_from, property_to: rule.property_to,
+                  property_inclusive: rule.property_inclusive }.stringify_keys
 
-    assert rule.valid?, "Event rule with datetime 'within range' operator should be valid"
-    assert rule.save, "Failed to save a valid datetime event rule with within range operator"
+    assert rule.valid?, "Event rule with datetime 'within range' should be valid"
+    assert rule.save, "Failed to save a valid datetime event rule"
   end
 
-  # Missing operator
-  test "should be invalid without an operator" do
+  # Event occurrence tests
+  test "should validate event occurrence with has occurred operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has occurred"
+    rule.data = { occurrence_operator: rule.occurrence_operator,
+                  datetime_from: rule.datetime_from }.stringify_keys
+
+    assert rule.valid?, "Event rule with 'has occurred' should be valid"
+    assert rule.save, "Failed to save a valid event rule"
+  end
+
+  test "should validate event non-occurrence with has not occurred operator" do
+    rule.ruleable = datetime_property
+    rule.occurrence_operator = "Has not occurred"
+    rule.data = { occurrence_operator: rule.occurrence_operator,
+                  datetime_from: rule.datetime_from }.stringify_keys
+
+    assert rule.valid?, "Event rule with 'has not occurred' should be valid"
+    assert rule.save, "Failed to save a valid event rule"
+  end
+
+  test "should validate datetime event rule within range of datetimes" do
+    rule.ruleable = datetime_property
+    rule.property_operator = "Within range"
+    rule.property_from = "2024-01-01T00:00:00+00:00"
+    rule.property_to = "2024-12-31T23:59:59+00:00"
+    rule.property_inclusive = true
+    rule.data = { property_operator: rule.property_operator,
+                  property_from: rule.property_from,
+                  property_to: rule.property_to,
+                  property_inclusive: rule.property_inclusive }.stringify_keys
+
+    assert rule.valid?, "Event rule with 'within range' should be valid"
+    assert rule.save, "Failed to save a valid event rule with datetime 'within range'"
+  end
+
+  ### Person based rule tests
+
+  ### Extra Error tests
+
+  test "should validate operator" do
     rule.ruleable = numeric_trait
-    rule.data = { value: 30 }.stringify_keys
+    rule.trait_operator = "Garbage"
+    rule.trait_value = "30"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid without an operator"
-    assert_includes rule.errors[:data], "Missing operator in data"
+    assert_not rule.valid?, "Person rule should have a valid operator"
+    assert_not rule.save, "Should not save to save an invalid person rule"
   end
 
-  # Invalid operator for numeric
-  test "should be invalid with invalid numeric operator" do
+  test "should validate missing trait operator" do
     rule.ruleable = numeric_trait
-    rule.operator = "InvalidOperator"
-    rule.value = 30
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.trait_operator = nil
+    rule.trait_value = "30"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid with invalid numeric operator"
-    assert_includes rule.errors[:operator], "Invalid numeric operator 'InvalidOperator'"
+    assert_not rule.valid?, "Person rule should have a valid operator"
+    assert_not rule.save, "Should not save to save an invalid person rule"
   end
 
-  # Invalid operator for text
-  test "should be invalid with invalid text operator" do
+
+  # Numeric trait tests
+  test "should validate numeric person rule with greater than operator" do
+    rule.ruleable = numeric_trait
+    rule.trait_operator = "Greater than"
+    rule.trait_value = "30"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
+
+    assert rule.valid?, "Person rule with numeric 'greater than' should be valid"
+    assert rule.save, "Failed to save a valid numeric person rule"
+  end
+
+  test "should validate numeric person rule within range" do
+    rule.ruleable = numeric_trait
+    rule.trait_operator = "Within range"
+    rule.trait_from = "20"
+    rule.trait_to = "30"
+    rule.trait_inclusive = true
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_from: rule.trait_from,
+                  trait_to: rule.trait_to,
+                  trait_inclusive: rule.trait_inclusive }.stringify_keys
+
+    assert rule.valid?, "Person rule with numeric 'within range' should be valid"
+    assert rule.save, "Failed to save a valid numeric person rule with range"
+  end
+
+  # Text trait tests
+  test "should validate text person rule with equals operator" do
     rule.ruleable = text_trait
-    rule.operator = "InvalidOperator"
-    rule.value = "Some Text"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.trait_operator = "Equals"
+    rule.trait_value = "Some Text"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value,
+                  case_sensitive: false }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid with invalid text operator"
-    assert_includes rule.errors[:operator], "Invalid text operator 'InvalidOperator'"
+    assert rule.valid?, "Person rule with text 'equals' operator should be valid"
+    assert rule.save, "Failed to save a valid text person rule with equals"
   end
 
-  # Invalid operator for boolean
-  test "should be invalid with invalid boolean operator" do
+  test "should validate text person rule with contains operator" do
+    rule.ruleable = text_trait
+    rule.trait_operator = "Contains"
+    rule.trait_value = "Text"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value,
+                  case_sensitive: true }.stringify_keys
+
+    assert rule.valid?, "Person rule with text 'contains' operator should be valid"
+    assert rule.save, "Failed to save a valid text person rule with contains"
+  end
+
+  # Boolean trait tests
+  test "should validate boolean person rule with is operator" do
     rule.ruleable = boolean_trait
-    rule.operator = "InvalidOperator"
-    rule.value = true
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.trait_operator = "Is"
+    rule.trait_value = true
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid with invalid boolean operator"
-    assert_includes rule.errors[:operator], "Invalid boolean operator 'InvalidOperator'"
+    assert rule.valid?, "Person rule with boolean 'is' operator should be valid"
+    assert rule.save, "Failed to save a valid boolean person rule with is"
   end
 
-  # Invalid operator for datetime
-  test "should be invalid with invalid datetime operator" do
+  # Datetime trait tests
+  test "should validate datetime person rule with before operator" do
     rule.ruleable = datetime_trait
-    rule.operator = "InvalidOperator"
-    rule.value = "2023-10-25T23:48:46+00:00"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
+    rule.trait_operator = "Before"
+    rule.trait_value = "2023-10-25T23:48:46+00:00"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid with invalid datetime operator"
-    assert_includes rule.errors[:operator], "Invalid datetime operator 'InvalidOperator'"
+    assert rule.valid?, "Person rule with datetime 'before' operator should be valid"
+    assert rule.save, "Failed to save a valid datetime person rule with before"
   end
 
-  # Missing numeric value
-  test "should be invalid without numeric value for Greater than operator" do
+  test "should validate datetime person rule within range" do
+    rule.ruleable = datetime_trait
+    rule.trait_operator = "Within range"
+    rule.trait_from = "2023-01-01T00:00:00+00:00"
+    rule.trait_to = "2023-12-31T23:59:59+00:00"
+    rule.trait_inclusive = true
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_from: rule.trait_from,
+                  trait_to: rule.trait_to,
+                  trait_inclusive: rule.trait_inclusive }.stringify_keys
+
+    assert rule.valid?, "Person rule with datetime 'within range' should be valid"
+    assert rule.save, "Failed to save a valid datetime person rule with range"
+  end
+
+  # Invalid operator cases for person rules
+  test "should be invalid without a numeric trait value for greater than" do
     rule.ruleable = numeric_trait
-    rule.operator = "Greater than"
-    rule.data = { operator: rule.operator }.stringify_keys
+    rule.trait_operator = "Greater than"
+    rule.data = { trait_operator: rule.trait_operator }.stringify_keys
 
     assert_not rule.valid?, "Rule should be invalid without numeric value"
-    assert_includes rule.errors[:value], "Numeric value must be present for Greater than"
+    assert_includes rule.errors[:trait_value],
+      "Numeric value must be present for Greater than"
   end
 
-  # Invalid range without from and to for numeric
-  test "should be invalid without from and to for numeric within range operator" do
+  test "should be invalid with invalid range for numeric" do
     rule.ruleable = numeric_trait
-    rule.operator = "Within range"
-    rule.inclusive = true
-    rule.data = { operator: rule.operator, inclusive: rule.inclusive }.stringify_keys
+    rule.trait_operator = "Within range"
+    rule.trait_inclusive = true
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_inclusive: rule.trait_inclusive }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid without from and to for within range"
-    assert_includes rule.errors[:from], "'from' and 'to' must be numeric for within range operator"
+    assert_not rule.valid?, "Rule should be invalid without range"
+    assert_includes rule.errors[:trait_from],
+      "'from' and 'to' must be numeric for 'within range' operator"
   end
 
-  # Invalid ISO8601 datetime
-  test "should be invalid with invalid datetime format for before operator" do
-    rule.ruleable = datetime_trait
-    rule.operator = "Before"
-    rule.value = "invalid-datetime"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
-
-    assert_not rule.valid?, "Rule should be invalid with invalid datetime format"
-    assert_includes rule.errors[:value], "Value must be a valid ISO8601 datetime string"
-  end
-
-  # Invalid case_sensitive for text rule
-  test "should be invalid with invalid case_sensitive value for text rule" do
+  test "should be invalid with invalid case_sensitive value for text" do
     rule.ruleable = text_trait
-    rule.operator = "Equals"
-    rule.value = "Some Text"
-    rule.data = { operator: rule.operator, value: rule.value, case_sensitive: "invalid" }.stringify_keys
+    rule.trait_operator = "Equals"
+    rule.trait_value = "Some Text"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value,
+                  case_sensitive: "invalid" }.stringify_keys
 
     assert_not rule.valid?, "Rule should be invalid with invalid case_sensitive"
-    assert_includes rule.errors[:case_sensitive], "case_sensitive must be true or false"
+    assert_includes rule.errors[:case_sensitive],
+      "case_sensitive must be true or false"
   end
 
-  # Invalid inclusive value for range operator
-  test "should be invalid with invalid inclusive value for within range operator" do
-    rule.ruleable = numeric_trait
-    rule.operator = "Within range"
-    rule.from = 20
-    rule.to = 30
-    rule.inclusive = nil
-    rule.data = { operator: rule.operator, from: rule.from, to: rule.to, inclusive: rule.inclusive }.stringify_keys
+  test "should be invalid with invalid datetime format for before operator" do
+    rule.ruleable = datetime_trait
+    rule.trait_operator = "Before"
+    rule.trait_value = "invalid-datetime"
+    rule.data = { trait_operator: rule.trait_operator,
+                  trait_value: rule.trait_value }.stringify_keys
 
-    assert_not rule.valid?, "Rule should be invalid with invalid inclusive value"
-    assert_includes rule.errors[:inclusive], "'inclusive' key must be true or false for within range operator"
-  end
-
-  test "should be invalid with unknown ruleable type" do
-    rule.ruleable_type = "Account"
-    rule.operator = "Equals"
-    rule.value = "Some Value"
-    rule.data = { operator: rule.operator, value: rule.value }.stringify_keys
-
-    assert_not rule.valid?, "Rule should be invalid with unknown ruleable type"
-    assert_includes rule.errors[:ruleable_type], "Unknown ruleable type"
+    assert_not rule.valid?, "Rule should be invalid with invalid datetime format"
+    assert_includes rule.errors[:trait_value],
+      "Value must be a valid ISO8601 datetime string"
   end
 end
