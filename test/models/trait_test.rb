@@ -1,53 +1,56 @@
 require "test_helper"
 
 class TraitTest < ActiveSupport::TestCase
-  setup do
-    @trait = traits(:one)
+  def account
+    @account ||= Fabricate(:account)
   end
 
-  test "fixture trait should be valid" do
-    assert @trait.valid?, "Fixture trait is not valid"
+  def trait
+    @trait ||= Fabricate.build(:trait, account: account)
   end
 
-  test "should not save trait without a name" do
-    trait = Trait.new(is_active: true, account: accounts(:one), value_type: :text)
-    assert_not trait.save, "Saved the trait without a name"
+  test "should be valid with valid attributes" do
+    assert trait.valid?, "Trait should be valid with valid attributes"
   end
 
-  test "should not save trait without is_active" do
-    trait = Trait.new(name: "Test Trait", account: accounts(:one), value_type: :text)
+  test "should not be valid without a name" do
+    trait.name = nil
+    assert_not trait.valid?, "Trait should not be valid without a name"
+    assert trait.errors[:name].any?, "There should be an error for the missing name"
+  end
+
+  test "should not be valid without is_active" do
     trait.is_active = nil
-    assert_not trait.save, "Saved the trait without an is_active value"
-    assert trait.errors[:is_active].any?, "There should be an error for the is_active"
+    assert_not trait.valid?, "Trait should not be valid without is_active"
+    assert trait.errors[:is_active].any?, "There should be an error for the missing is_active"
   end
 
-  test "should not save trait without account" do
-    trait = Trait.new(name: "Test Trait", is_active: true, value_type: :text)
-    assert_not trait.save, "Saved the trait without an account"
-    assert trait.errors[:account].any?, "There should be an error for the account"
+  test "should not be valid without account" do
+    trait.account = nil
+    assert_not trait.valid?, "Trait should not be valid without an account"
+    assert trait.errors[:account].any?, "There should be an error for the missing account"
   end
 
-  test "should not save trait without value_type" do
-    trait = Trait.new(name: "Test Trait", is_active: true, account: accounts(:one))
+  test "should not be valid without value_type" do
     trait.value_type = nil
-    assert_not trait.save, "Saved the trait without a value_type"
-    assert trait.errors[:value_type].any?, "There should be an error for the value_type"
+    assert_not trait.valid?, "Trait should not be valid without a value_type"
+    assert trait.errors[:value_type].any?, "There should be an error for the missing value_type"
   end
 
   test "should allow valid value_type" do
-    trait = Trait.new(name: "Test Trait", is_active: true, account: accounts(:one), value_type: :numeric)
+    trait.value_type = :numeric
+    assert trait.valid?, "Trait should be valid with value_type :numeric"
     assert trait.save, "Failed to save a valid trait with value_type :numeric"
   end
 
   test "should reject invalid value_type" do
-    trait = Trait.new(name: "Test Trait", is_active: true, account: accounts(:one))
     assert_raises ArgumentError do
       trait.value_type = :invalid_type
     end
   end
 
   test "should correctly handle value_type enums" do
-    trait = Trait.new(name: "Test Trait", is_active: true, account: accounts(:one), value_type: :boolean)
+    trait.value_type = :boolean
     assert_equal "boolean", trait.value_type, "Trait value_type should be 'boolean'"
     trait.value_type = :datetime
     assert_equal "datetime", trait.value_type, "Trait value_type should be 'datetime'"

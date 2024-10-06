@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_04_113417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -138,6 +138,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
     t.index ["account_id"], name: "index_flows_on_account_id"
   end
 
+  create_table "goal_rule_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "goal_id", null: false
+    t.uuid "rule_group_id", null: false
+    t.integer "state", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_goal_rule_groups_on_goal_id"
+    t.index ["rule_group_id"], name: "index_goal_rule_groups_on_rule_group_id"
+    t.index ["state"], name: "index_goal_rule_groups_on_state"
+  end
+
   create_table "goal_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "goal_id", null: false
     t.uuid "rule_id", null: false
@@ -155,6 +166,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "data", null: false
     t.index ["account_id"], name: "index_goals_on_account_id"
   end
 
@@ -282,6 +294,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
     t.uuid "child_group_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "operator"
     t.index ["child_group_id"], name: "index_rule_group_memberships_on_child_group_id"
     t.index ["parent_group_id", "child_group_id"], name: "index_rule_group_memberships_on_parent_and_child", unique: true
     t.index ["parent_group_id"], name: "index_rule_group_memberships_on_parent_group_id"
@@ -292,6 +305,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
     t.uuid "rule_group_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "operator"
     t.index ["rule_group_id"], name: "index_rule_group_rules_on_rule_group_id"
     t.index ["rule_id"], name: "index_rule_group_rules_on_rule_id"
   end
@@ -308,10 +322,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
   create_table "rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.text "name", null: false
-    t.jsonb "rule_data", null: false
+    t.jsonb "data", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ruleable_type", null: false
+    t.uuid "ruleable_id", null: false
     t.index ["account_id"], name: "index_rules_on_account_id"
+    t.index ["name", "account_id"], name: "index_rules_on_name_and_account_id", unique: true
+    t.index ["ruleable_type", "ruleable_id"], name: "index_rules_on_ruleable_type_and_ruleable_id"
   end
 
   create_table "trait_values", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -361,6 +379,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_02_095456) do
   add_foreign_key "flow_recipients", "flows"
   add_foreign_key "flow_recipients", "people"
   add_foreign_key "flows", "accounts"
+  add_foreign_key "goal_rule_groups", "goals"
+  add_foreign_key "goal_rule_groups", "rule_groups"
   add_foreign_key "goal_rules", "goals"
   add_foreign_key "goal_rules", "rules"
   add_foreign_key "goals", "accounts"

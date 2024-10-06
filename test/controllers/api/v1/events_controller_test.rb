@@ -2,11 +2,12 @@ require "test_helper"
 
 class Api::V1::EventsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @client_application = Fabricate(:client_application)
     @valid_event = {
       event: {
         user_id: "0191faa2-b4d7-78bc-8cdc-6a4dc176ebb4",
         name: "newSubscription",
-        application_id: client_applications(:one).id,
+        application_id: @client_application.id,
         timestamp: "2023-10-05T14:48:00Z",
         properties: {
           "subscription_value" => "930",
