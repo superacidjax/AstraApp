@@ -297,22 +297,22 @@ class GoalTest < ActiveSupport::TestCase
     }.to_json
 
     # Test for numeric trait
-    Fabricate(:trait_rule, account: @account, value: "100")
+    Fabricate(:trait_rule, account: @account, trait_value: "100")
     goal_numeric = Fabricate.build(:goal, data: invalid_operator_data)
     assert_not goal_numeric.valid?, "Goal with numeric trait should be invalid with invalid operator"
 
     # Test for text trait
-    Fabricate(:trait_rule, account: @account, value: "text")
+    Fabricate(:trait_rule, account: @account, trait_value: "text")
     goal_text = Fabricate.build(:goal, data: invalid_operator_data)
     assert_not goal_text.valid?, "Goal with text trait should be invalid with invalid operator"
 
     # Test for boolean trait
-    Fabricate(:trait_rule, account: @account, value: "true")
+    Fabricate(:trait_rule, account: @account, trait_value: "true")
     goal_boolean = Fabricate.build(:goal, data: invalid_operator_data)
     assert_not goal_boolean.valid?, "Goal with boolean trait should be invalid with invalid operator"
 
     # Test for datetime trait
-    Fabricate(:trait_rule, account: @account, value: Time.now)
+    Fabricate(:trait_rule, account: @account, trait_value: Time.now)
     goal_datetime = Fabricate.build(:goal, data: invalid_operator_data)
     assert_not goal_datetime.valid?, "Goal with datetime trait should be invalid with invalid operator"
   end

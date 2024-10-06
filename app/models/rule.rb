@@ -10,12 +10,38 @@ class Rule < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :account_id }
   validates :data, presence: true
-  validates_with RuleDataValidator
+  validates_with EventRuleDataValidator, if: :event_rule?
+  validates_with PersonRuleDataValidator, if: :person_rule?
 
   jsonb_accessor :data,
-    operator: :string,       # Operator for comparison (e.g., "Is", "Greater than")
-    value: :string,          # Unified field for both trait and property values
-    from: :string,           # For range-based rules
-    to: :string,             # For range-based rules
-    inclusive: :boolean      # For specifying if the range is inclusive
+    # For Person-based and Event-based rule comparisons (trait/property)
+    trait_operator: :string,        # Operator for trait (e.g., "Greater than", "Equals")
+    trait_value: :string,           # Value for trait comparison
+    trait_from: :string,            # For range-based trait rules
+    trait_to: :string,              # For range-based trait rules
+    trait_inclusive: :boolean,      # Inclusive/exclusive range for traits
+
+    property_operator: :string,     # Operator for properties in event-based rules
+    property_value: :string,        # Value for property comparison
+    property_from: :string,         # For range-based property rules
+    property_to: :string,           # For range-based property rules
+    property_inclusive: :boolean,   # Inclusive/exclusive range for properties
+
+    # Event Occurrence-related fields (for event-based rules only)
+    occurrence_operator: :string,   # "Has occurred" or "Has not occurred"
+    time_unit: :string,             # Time unit (e.g., "hours", "days", "months", "years")
+    time_value: :integer,           # Number of time units (e.g., "10" for 10 days)
+    datetime_from: :datetime,       # Specific datetime for 'Since' or start of datetime range
+    datetime_to: :datetime,         # Specific datetime for end of datetime range
+    occurrence_inclusive: :boolean  # Inclusive/exclusive datetime range for events
+
+  private
+
+  def event_rule?
+    ruleable_type == "Property"
+  end
+
+  def person_rule?
+    ruleable_type == "Trait"
+  end
 end
