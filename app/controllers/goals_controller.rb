@@ -33,31 +33,13 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(
-      :name,
-      :description,
-      :data,
-      goal_rules_attributes: [
-        :id,
-        :rule_id,
-        :operator,
-        :_destroy
-      ],
-      goal_rule_groups_attributes: [
-        :id,
-        :rule_group_id,
-        :operator,
-        :_destroy,
-        rule_group_attributes: [
-          :name,
-          :data,
-          rule_group_memberships_attributes: [
-            :id,
-            :parent_group_id,
-            :child_group_id,
-            :operator,
-            :_destroy
-          ]
+    params.require(:goal).permit(:name, :description, :data,
+      goal_rules_attributes: [ :id, :rule_id, :operator, :_destroy ],
+      goal_rule_groups_attributes: [ :id, :rule_group_id, :operator, :_destroy,
+        rule_group_attributes: [ :name, :data,
+          rule_group_memberships_attributes: [ :id, :parent_group_id,
+                                               :child_group_id, :operator,
+                                               :_destroy ]
         ]
       ]
     )
