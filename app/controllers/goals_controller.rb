@@ -1,8 +1,8 @@
 class GoalsController < ApplicationController
   def new
     @goal = Goal.new
-    @goal.goal_rule_groups.build  # Builds an initial rule group
-    @goal.goal_rules.build        # Builds an initial standalone rule
+    @goal.goal_rule_groups.build
+    @goal.goal_rules.build
   end
 
   def create
@@ -10,6 +10,7 @@ class GoalsController < ApplicationController
     @goal.account = Account.last # Not implemented
 
     if @goal.save
+      GoalCreationService.new(@goal, params[:goal][:data]).process
       respond_to do |format|
         format.html { redirect_to @goal, notice: "Goal was successfully created." }
         format.turbo_stream { flash.now[:notice] = "Goal was successfully created." }

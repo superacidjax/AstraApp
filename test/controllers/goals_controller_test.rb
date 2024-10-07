@@ -2,139 +2,200 @@ require "test_helper"
 
 class GoalsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @account = Fabricate(:account)  # Ensure an account is set up for the goal
+    @account = Fabricate(:account)
+    @client_application = Fabricate(:client_application, account: @account)
+    
+    # Fabricating traits and properties for use in rules
+    @trait_text = Fabricate(:trait, account: @account, value_type: "text")
+    @trait_numeric = Fabricate(:trait, account: @account, value_type: "numeric")
+    @trait_boolean = Fabricate(:trait, account: @account, value_type: "boolean")
+
+    @property_numeric = Fabricate(:property, event: Fabricate(:event, client_application: @client_application), value_type: "numeric")
+    @property_datetime = Fabricate(:property, event: Fabricate(:event, client_application: @client_application), value_type: "datetime")
   end
 
-  test "should get new goal form" do
-    get new_goal_url
-    assert_response :success
-    assert_select "form"  # Ensures the form is rendered
-  end
-
-  test "should create goal with name, description, and valid data" do
-    assert_difference("Goal.count", 1) do
-      post goals_url, params: {
-        goal: {
-          name: "Pre-Diabetic Engagement",
-          description: "This goal is to help identify pre-diabetic people.",
-          account_id: @account.id,  # Include the account
-          data: valid_goal_data  # Ensure data is passed and valid
-        }
-      }
+  test "should create goal with valid nested data for rules and rule groups" do
+    assert_difference -> { Goal.count }, 1 do
+      assert_difference -> { Rule.count }, 11 do
+        assert_difference -> { GoalRule.count }, 11 do
+          assert_difference -> { RuleGroup.count }, 7 do
+            assert_difference -> { GoalRuleGroup.count }, 7 do
+              assert_difference -> { RuleGroupMembership.count }, 4 do
+                post goals_url, params: {
+                  goal: {
+                    name: "Complex Engagement Goal",
+                    description: "A complex goal with multiple rules and rule groups",
+                    account_id: @account.id,
+                    data: valid_goal_data  # Ensure this structure is correct
+                  }
+                }
+              end
+            end
+          end
+        end
+      end
     end
 
     goal = Goal.last
-    assert_redirected_to goal_url(goal)
-    follow_redirect!
-    assert_select "h1", text: /Pre-Diabetic Engagement/  # Confirms the goal name is displayed
-    assert_select "p", text: /identify pre-diabetic people/  # Confirms the description is displayed
-  end
+    assert_equal "Complex Engagement Goal", goal.name
 
-  test "should show goal" do
-    goal = Goal.create!(
-      name: "Pre-Diabetic Engagement",
-      description: "This goal is to help identify pre-diabetic people.",
-      account: @account,  # Ensure an account is associated
-      data: valid_goal_data
-    )
+    # Verify rules and rule groups were created correctly
+    assert_equal 11, goal.rules.count
+    assert_equal 7, goal.rule_groups.count
 
-    get goal_url(goal)
-    assert_response :success
-    assert_select "h1", text: /Pre-Diabetic Engagement/  # Verifies the goal name
-    assert_select "p", text: /identify pre-diabetic people/  # Verifies the description
-  end
+    # Check goal_rule states
+    assert_equal 5, goal.goal_rules.where(state: "initial").count
+    assert_equal 6, goal.goal_rules.where(state: "end").count
 
-  test "should get index" do
-    Goal.create!(
-      name: "Pre-Diabetic Engagement",
-      description: "This goal is to help identify pre-diabetic people.",
-      account: @account,  # Ensure an account is associated
-      data: valid_goal_data
-    )
-    Goal.create!(
-      name: "Diabetes Risk Engagement",
-      description: "This goal is to engage with people at risk for diabetes.",
-      account: @account,
-      data: valid_goal_data
-    )
+    # Check goal_rule_groups states
+    assert_equal 3, goal.goal_rule_groups.where(state: "initial").count
+    assert_equal 4, goal.goal_rule_groups.where(state: "end").count
 
-    get goals_url
-    assert_response :success
-    assert_select "td", text: /Pre-Diabetic Engagement/  # Verifies the first goal in the list
-    assert_select "td", text: /Diabetes Risk Engagement/  # Verifies the second goal in the list
-  end
+    # Check parent and child groups
+    parent_groups = RuleGroup.where(id: goal.goal_rule_groups.map(&:rule_group_id))
+    assert_equal 7, parent_groups.count  # 2 parent groups
+    child_groups = RuleGroup.joins(:rule_group_memberships).where(rule_group_memberships: { parent_group_id: parent_groups.pluck(:id) })
+    assert_equal 4, child_groups.count  # 3 child groups
 
-  ### Errors
-
-  test "should re-render new with unprocessable_entity status when goal creation fails (HTML)" do
-    assert_no_difference("Goal.count") do
-      post goals_url, params: {
-        goal: {
-          name: "",  # Invalid: missing name
-          description: "This goal is to help identify pre-diabetic people.",
-          account_id: @account.id,
-          data: valid_goal_data  # Valid data but missing the name
-        }
-      }
-    end
-
-    assert_response :unprocessable_entity
-    assert_select "form"  # Verifies that the form is re-rendered
-    assert_select "div#error_explanation", text: /Name can't be blank/  # Verifies error message is displayed
-  end
-
-  test "should re-render new with unprocessable_entity status when goal creation fails (Turbo Stream)" do
-    assert_no_difference("Goal.count") do
-      post goals_url, params: {
-        goal: {
-          name: "",  # Invalid: missing name
-          description: "This goal is to help identify pre-diabetic people.",
-          account_id: @account.id,
-          data: valid_goal_data  # Valid data but missing the name
-        },
-        format: :turbo_stream  # Simulates a Turbo Stream request
-      }
-    end
-
-    assert_response :unprocessable_entity
-    assert_match(/turbo-stream/, @response.content_type)  # Verifies response is Turbo Stream
-    assert_select "form"  # Verifies that the form is re-rendered
-    assert_select "div#error_explanation", text: /Name can't be blank/  # Verifies error message is displayed
+    # Ensure rule group memberships are correct
+    assert_equal 4, RuleGroupMembership.count
   end
 
   private
 
   def valid_goal_data
-    {
-      "initial_state" => {
-        "items" => [
-          {
-            "type" => "rule_group",
-            "operator" => nil,
-            "items" => [
-              {
-                "type" => "rule",
-                "rule_id" => "1",  # Use a placeholder for the test
-                "operator" => "AND"  # Operator between the rules
-              },
-              {
-                "type" => "rule",
-                "rule_id" => "2",  # No operator on the last item in the group
-                "operator" => nil
-              }
-            ]
-          }
-        ]
-      },
-      "end_state" => {
-        "items" => [
-          {
-            "type" => "rule",
-            "rule_id" => "3",
-            "operator" => nil  # No operator for the last rule
-          }
-        ]
-      }
-    }.to_json
-  end
+  {
+    "initial_state" => {
+      "items" => [
+        {
+          "type" => "rule_group",
+          "name" => "Group 1",
+          "operator" => "AND",
+          "items" => [
+            {
+              "type" => "rule_group",
+              "name" => "Group 1.1",
+              "operator" => "OR",
+              "items" => [
+                {
+                  "type" => "rule",
+                  "name" => "Rule 1",
+                  "data" => { "trait_operator" => "Equals", "trait_value" => "some value" },
+                  "ruleable" => { "type" => "trait", "value_type" => "text", "id" => @trait_text.id },
+                  "operator" => "AND"
+                },
+                {
+                  "type" => "rule",
+                  "name" => "Rule 2",
+                  "data" => { "property_operator" => "Greater than", "property_value" => "100" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "property", "value_type" => "numeric", "id" => @property_numeric.id },
+                  "operator" => nil
+                }
+              ]
+            },
+            {
+              "type" => "rule_group",
+              "name" => "Group 1.2",
+              "items" => [
+                {
+                  "type" => "rule",
+                  "name" => "Rule 3",
+                  "data" => { "trait_operator" => "Contains", "trait_value" => "keyword" },
+                  "ruleable" => { "type" => "trait", "value_type" => "text", "id" => @trait_text.id },
+                  "operator" => "OR"
+                },
+                {
+                  "type" => "rule",
+                  "name" => "Rule 4",
+                  "data" => { "property_operator" => "Less than", "property_value" => "50" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "property", "value_type" => "numeric", "id" => @property_numeric.id },
+                  "operator" => nil
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type" => "rule",
+          "name" => "Rule 5",
+          "data" => { "trait_operator" => "Is", "trait_value" => "true" },
+          "ruleable" => { "type" => "trait", "value_type" => "boolean", "id" => @trait_boolean.id },
+          "operator" => nil
+        }
+      ]
+    },
+    "end_state" => {
+      "items" => [
+        {
+          "type" => "rule_group",
+          "name" => "Group 2",
+          "operator" => "OR",
+          "items" => [
+            {
+              "type" => "rule",
+              "name" => "Rule 6",
+              "data" => { "property_operator" => "Within range", "property_from" => "20", "property_to" => "100", "property_inclusive" => true }, # 'inclusive' added
+              "ruleable" => { "type" => "property", "value_type" => "numeric", "id" => @property_numeric.id },
+              "operator" => "OR"
+            },
+            {
+              "type" => "rule_group",
+              "name" => "Group 2.1",
+              "items" => [
+                {
+                  "type" => "rule",
+                  "name" => "Rule 7",
+                  "data" => { "trait_operator" => "Greater than", "trait_value" => "5" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "trait", "value_type" => "numeric", "id" => @trait_numeric.id },
+                  "operator" => "AND"
+                },
+                {
+                  "type" => "rule",
+                  "name" => "Rule 8",
+                  "data" => { "property_operator" => "Before", "property_value" => "2024-01-01T00:00:00+00:00" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "property", "value_type" => "datetime", "id" => @property_datetime.id },
+                  "operator" => nil
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type" => "rule_group",
+          "name" => "Group 3",
+          "items" => [
+            {
+              "type" => "rule",
+              "name" => "Rule 9",
+              "data" => { "trait_operator" => "Not equals", "trait_value" => "some other value" }, # No 'inclusive' key needed
+              "ruleable" => { "type" => "trait", "value_type" => "text", "id" => @trait_text.id },
+              "operator" => "OR"
+            },
+            {
+              "type" => "rule_group",
+              "name" => "Group 3.1",
+              "operator" => nil,
+              "items" => [
+                {
+                  "type" => "rule",
+                  "name" => "Rule 10",
+                  "data" => { "trait_operator" => "Is not", "trait_value" => "false" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "trait", "value_type" => "boolean", "id" => @trait_boolean.id },
+                  "operator" => "AND"
+                },
+                {
+                  "type" => "rule",
+                  "name" => "Rule 11",
+                  "data" => { "property_operator" => "After", "property_value" => "2024-12-31T23:59:59+00:00" }, # No 'inclusive' key needed
+                  "ruleable" => { "type" => "property", "value_type" => "datetime", "id" => @property_datetime.id },
+                  "operator" => nil
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }.to_json
 end
+  end

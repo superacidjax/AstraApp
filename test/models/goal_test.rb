@@ -125,23 +125,6 @@ class GoalTest < ActiveSupport::TestCase
     assert_includes goal.errors[:data], "initial_state: Operator 'INVALID_OP' is not valid. Allowed operators are AND, OR, NOT."
   end
 
-  test "invalid goal with missing rule_id" do
-    invalid_data = {
-      "initial_state" => {
-        "items" => [
-          {
-            "type" => "rule",
-            "operator" => nil
-          }
-        ]
-      }
-    }.to_json
-
-    goal = Fabricate.build(:goal, data: invalid_data)
-    assert_not goal.valid?, "Goal should be invalid without rule_id"
-    assert_includes goal.errors[:data], "initial_state: Rule ID is required."
-  end
-
   test "invalid goal with rule group containing less than two items" do
     invalid_data = {
       "initial_state" => {

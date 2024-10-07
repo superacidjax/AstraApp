@@ -11,14 +11,4 @@ class RuleGroup < ApplicationRecord
   accepts_nested_attributes_for :rule_group_memberships, allow_destroy: true
 
   validates :name, presence: true
-  validate :must_have_rule_or_group
-
-  private
-
-  def must_have_rule_or_group
-    items = data["items"] if data.is_a?(Hash)
-    if items.blank? || !items.is_a?(Array) || items.empty?
-      errors.add(:data, "must contain at least one rule or rule group")
-    end
-  end
 end

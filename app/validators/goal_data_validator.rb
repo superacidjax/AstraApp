@@ -76,25 +76,17 @@ class GoalDataValidator < ActiveModel::Validator
     end
   end
 
-  # Validate the type of the item (rule or rule group)
+  # Validate the type of the item (rule group)
   def validate_item_type(context)
     item = context.item
     record = context.record
 
     case item["type"]
     when "rule"
-      validate_rule(record, item, context.context)
     when "rule_group"
       validate_rule_group(record, item, context.context)
     else
       record.errors.add(:data, "#{context.context}: Invalid item type '#{item['type']}'.")
-    end
-  end
-
-  # Validate a rule item
-  def validate_rule(record, item, context)
-    if item["rule_id"].blank?
-      record.errors.add(:data, "#{context}: Rule ID is required.")
     end
   end
 
