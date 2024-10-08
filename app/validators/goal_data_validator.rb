@@ -2,6 +2,7 @@ class GoalDataValidator < ActiveModel::Validator
   ALLOWED_OPERATORS = %w[AND OR NOT].freeze
 
   def validate(record)
+    return if record.data.blank?
     begin
       data = JSON.parse(record.data)
     rescue JSON::ParserError

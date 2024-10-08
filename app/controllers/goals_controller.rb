@@ -10,7 +10,7 @@ class GoalsController < ApplicationController
     @goal.account = Account.last # Not implemented
 
     if @goal.save
-      GoalCreationService.new(@goal, params[:goal][:data]).process
+      GoalCreationService.new(@goal).call
       respond_to do |format|
         format.html { redirect_to @goal, notice: "Goal was successfully created." }
         format.turbo_stream { flash.now[:notice] = "Goal was successfully created." }
@@ -25,6 +25,8 @@ class GoalsController < ApplicationController
 
   def show
     @goal = Goal.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to goals_url, flash: { danger: "Goal not found" }
   end
 
   def index
@@ -34,13 +36,20 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:name, :description, :data,
-      goal_rules_attributes: [ :id, :rule_id, :operator, :_destroy ],
-      goal_rule_groups_attributes: [ :id, :rule_group_id, :operator, :_destroy,
-        rule_group_attributes: [ :name, :data,
-          rule_group_memberships_attributes: [ :id, :parent_group_id,
-                                               :child_group_id, :operator,
-                                               :_destroy ]
+    params.require(:goal).permit(
+      :name, :description, :data,
+      goal_rules_attributes: [
+        :id, :rule_id, :operator, :_destroy
+      ],
+      goal_rule_groups_attributes: [
+        :id, :rule_group_id, :operator, :_destroy,
+        rule_group_attributes: [
+          :name, :data,
+          rule_group_memberships_attributes: [
+            :id, :parent_group_id,
+            :child_group_id, :operator,
+            :_destroy
+          ]
         ]
       ]
     )
