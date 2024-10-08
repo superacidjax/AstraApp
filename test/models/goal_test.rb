@@ -95,7 +95,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid without operator in rule group"
@@ -118,7 +118,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid with invalid operator"
@@ -142,7 +142,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid with rule group containing less than two items"
@@ -165,7 +165,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid with operator on last item"
@@ -182,19 +182,11 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid with invalid item type"
     assert_includes goal.errors[:data], "initial_state: Invalid item type 'invalid_type'."
-  end
-
-  test "should be invalid with malformed JSON data" do
-    invalid_json_data = "invalid_json_data"
-
-    goal = Fabricate.build(:goal, data: invalid_json_data)
-    assert_not goal.valid?, "Goal should be invalid with malformed JSON data"
-    assert_includes goal.errors[:data], "must be valid JSON", "Error should include 'must be valid JSON'"
   end
 
   test "should be invalid if items is not an array in initial_state" do
@@ -211,7 +203,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid if 'items' is not an array in initial_state"
@@ -232,7 +224,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid if 'items' array is empty in initial_state"
@@ -259,7 +251,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     goal = Fabricate.build(:goal, data: invalid_data)
     assert_not goal.valid?, "Goal should be invalid if 'items' in rule group is not an array"
@@ -277,7 +269,7 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
 
     # Test for numeric trait
     Fabricate(:trait_rule, account: @account, trait_value: "100")
@@ -338,6 +330,6 @@ class GoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
   end
 end

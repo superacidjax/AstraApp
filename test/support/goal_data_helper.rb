@@ -132,6 +132,6 @@ module GoalDataHelper
           }
         ]
       }
-    }.to_json
+    }
   end
 end

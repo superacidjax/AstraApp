@@ -52,6 +52,8 @@ class GoalsController < ApplicationController
           ]
         ]
       ]
-    )
+    ).tap do |whitelisted|
+      whitelisted[:data] = params[:goal][:data].permit! if params[:goal][:data].present?
+    end
   end
 end

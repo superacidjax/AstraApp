@@ -1,0 +1,18 @@
+<div class="goal-component">
+  <div class="goal-header">
+    <h2><%= @goal.name %></h2>
+    <span class="success-rate"><%= success_rate %></span>
+  </div>
+
+  <div class="goal-description">
+    <p><%= @goal.description %></p>
+  </div>
+
+  <div class="goal-rules">
+    <h3>Audience:</h3>
+    <p><%= format_rules("initial_state") %></p>
+
+    <h3>Outcome:</h3>
+    <p><%= format_rules("end_state") %></p>
+  </div>
+</div>

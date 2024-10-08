@@ -3,9 +3,9 @@ class GoalDataValidator < ActiveModel::Validator
 
   def validate(record)
     return if record.data.blank?
-    begin
-      data = JSON.parse(record.data)
-    rescue JSON::ParserError
+    if record.data.is_a?(Hash)
+      data = record.data
+    else
       record.errors.add(:data, "must be valid JSON")
       return
     end

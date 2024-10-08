@@ -1,7 +1,7 @@
 class GoalCreationService
   def initialize(goal)
     @goal = goal
-    @goal_data = JSON.parse(@goal.data)
+    @goal_data = @goal.data
     @goal_rules = []
     @goal_rule_groups = []
     @rule_group_memberships = []

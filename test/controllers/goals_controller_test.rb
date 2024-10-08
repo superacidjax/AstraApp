@@ -26,6 +26,15 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
     ))
   end
 
+  test "should get new" do
+    get new_goal_url
+    assert_response :success
+
+    assert assigns(:goal).is_a?(Goal)
+    assert assigns(:goal).goal_rule_groups.present?
+    assert assigns(:goal).goal_rules.present?
+  end
+
   test "should successfully create goal and redirect" do
     post goals_url, params: {
       goal: {
@@ -40,12 +49,12 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
           property_datetime: @property_datetime
         )
       }
-    }
+    }.as_json
 
-    goal = Goal.find_by_name("Simplified Goal")
+    assert goal = Goal.find_by_name("Simplified Goal")
     assert_redirected_to goal_url(goal)
     follow_redirect!
-    assert_select "h1", "Simplified Goal"
+    assert_select "h2", "Simplified Goal"
   end
 
   test "should render new with errors on failure" do
@@ -65,7 +74,7 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
   test "should show goal" do
     get goal_url(@goal)
     assert_response :success
-    assert_select "h1", @goal.name
+    assert_select "h2", @goal.name
   end
 
   test "should redirect to index with flash danger if goal not found" do

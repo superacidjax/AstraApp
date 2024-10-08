@@ -13,3 +13,30 @@
  *= require_tree .
  *= require_self
  */
+
+.goal-component {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success-rate {
+  font-size: 1.2em;
+  color: green;
+}
+
+.goal-description {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.goal-rules h3 {
+  margin-top: 15px;
+  font-weight: bold;
+}
