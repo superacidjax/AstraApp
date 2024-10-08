@@ -12,8 +12,8 @@ class GoalsController < ApplicationController
     if @goal.save
       GoalCreationService.new(@goal).call
       respond_to do |format|
-        format.html { redirect_to @goal, notice: "Goal was successfully created." }
-        format.turbo_stream { flash.now[:notice] = "Goal was successfully created." }
+        format.html { redirect_to @goal, notice: "Goal created." }
+        format.turbo_stream { flash.now[:notice] = "Goal created." }
       end
     else
       respond_to do |format|
