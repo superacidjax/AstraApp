@@ -50,20 +50,12 @@ GEM
       globalid (>= 0.3.6)
     activemodel (7.2.1)
       activesupport (= 7.2.1)
-    activemodel-serializers-xml (1.0.3)
-      activemodel (>= 5.0.0.a)
-      activesupport (>= 5.0.0.a)
-      builder (~> 3.1)
     activerecord (7.2.1)
       activemodel (= 7.2.1)
       activesupport (= 7.2.1)
       timeout (>= 0.4.0)
     activerecord-import (1.8.1)
       activerecord (>= 4.2)
-    activeresource (6.1.1)
-      activemodel (>= 6.0)
-      activemodel-serializers-xml (~> 1.0)
-      activesupport (>= 6.0)
     activestorage (7.2.1)
       actionpack (= 7.2.1)
       activejob (= 7.2.1)
@@ -139,9 +131,6 @@ GEM
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.13.0)
-      actionview (>= 5.0.0)
-      activesupport (>= 5.0.0)
     json (2.7.2)
     jsonb_accessor (1.4)
       activerecord (>= 6.1)
@@ -225,6 +214,10 @@ GEM
       activesupport (= 7.2.1)
       bundler (>= 1.15.0)
       railties (= 7.2.1)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -330,8 +323,10 @@ GEM
     useragent (0.16.10)
     uuid7 (0.2.0)
       zeitwerk (~> 2.4)
-    view_components (0.1.0)
-      rails
+    view_component (3.16.0)
+      activesupport (>= 5.2.0, < 8.0)
+      concurrent-ruby (~> 1.0)
+      method_source (~> 1.0)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -360,20 +355,19 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-import
-  activeresource
   bootsnap
   brakeman
   capybara
   fabrication
   good_job
   importmap-rails
-  jbuilder
   jsonb_accessor
   ostruct
   pg (~> 1.5)
   pry-rails
   puma (>= 5.0)
   rails (~> 7.2.1)
+  rails-controller-testing
   rails-erd
   redis (>= 4.0.1)
   rubocop-rails-omakase
@@ -386,7 +380,7 @@ DEPENDENCIES
   stimulus-rails
   turbo-rails
   uuid7
-  view_components
+  view_component
   web-console
   webmock
 

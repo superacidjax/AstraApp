@@ -71,6 +71,6 @@ class FlowGoalTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
   end
 end

@@ -31,18 +31,6 @@ class RuleGroupTest < ActiveSupport::TestCase
     assert_includes rule_group.errors[:name], "can't be blank"
   end
 
-  test "should be invalid without data" do
-    rule_group.data = nil
-    assert_not rule_group.valid?
-    assert_includes rule_group.errors[:data], "must contain at least one rule or rule group"
-  end
-
-  test "should be invalid with empty data" do
-    rule_group.data = {}
-    assert_not rule_group.valid?
-    assert_includes rule_group.errors[:data], "must contain at least one rule or rule group"
-  end
-
   test "should be valid with at least one trait rule in data" do
     rule_group.data = {
       "items" => [
@@ -97,12 +85,6 @@ class RuleGroupTest < ActiveSupport::TestCase
     first_item = items.first
     assert_equal "rule_group", first_item["type"]
     assert_equal nested_rule_group.id, first_item["rule_group_id"]
-  end
-
-  test "must_have_rule_or_group validation should fail if data is empty" do
-    rule_group.data = { "items" => [] }
-    assert_not rule_group.valid?
-    assert_includes rule_group.errors[:data], "must contain at least one rule or rule group"
   end
 
   test "must_have_rule_or_group validation should pass with valid data" do

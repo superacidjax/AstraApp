@@ -12,4 +12,8 @@ class Goal < ApplicationRecord
   validates :success_rate, presence: true, numericality: true
   validates :data, presence: true
   validates_with GoalDataValidator
+
+  jsonb_accessor :data,
+    initial_state: :jsonb,
+    end_state: :jsonb
 end

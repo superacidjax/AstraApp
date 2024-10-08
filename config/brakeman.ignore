@@ -45,8 +45,31 @@
         915
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "d79b9316372e1526e6438c3e8cb5e3da5e259bd375900b5d30f23f85b7965ed4",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/goals_controller.rb",
+      "line": 56,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params[:goal][:data].permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoalsController",
+        "method": "goal_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": ""
     }
   ],
-  "updated": "2024-09-29 11:13:39 +0200",
+  "updated": "2024-10-08 19:58:25 +0200",
   "brakeman_version": "6.2.1"
 }

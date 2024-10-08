@@ -2,24 +2,8 @@
 
 <%= link_to "Create New Goal", new_goal_path, class: "btn btn-primary" %>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @goals.each do |goal| %>
-      <tr>
-        <td><%= goal.name %></td>
-        <td><%= truncate(goal.description, length: 100) %></td>
-        <td>
-          <%= link_to "Show", goal_path(goal), class: "btn btn-secondary" %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<div class="goals-list">
+  <% @goals.each do |goal| %>
+    <%= render GoalComponent.new(goal: goal) %>
+  <% end %>
+</div>

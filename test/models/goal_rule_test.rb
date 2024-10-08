@@ -69,6 +69,6 @@ class GoalRuleTest < ActiveSupport::TestCase
           }
         ]
       }
-    }.to_json
+    }
   end
 end
