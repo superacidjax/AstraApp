@@ -1,8 +1,12 @@
 class GoalsController < ApplicationController
+  before_action :set_current_account
+
   def new
     @goal = Goal.new
     @goal.goal_rule_groups.build
     @goal.goal_rules.build
+    @client_applications = @current_account.client_applications
+    @traits = get_traits
   end
 
   def create
@@ -34,6 +38,19 @@ class GoalsController < ApplicationController
   end
 
   private
+
+  def set_current_account
+    @current_account = Account.first
+  end
+
+  def get_traits
+    # add caching
+    Trait.joins(:client_application_traits)
+      .where(client_application_traits: {
+        client_application_id: @current_account.client_applications.ids
+      })
+        .select(:id, :name, :client_application_id).distinct
+  end
 
   def goal_params
     params.require(:goal).permit(

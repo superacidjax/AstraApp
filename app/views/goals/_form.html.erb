@@ -11,7 +11,6 @@
 <% end %>
 
 <%= form_with(model: @goal, local: true, id: "goal_form") do |form| %>
-  <!-- Your form fields go here -->
   <div class="form-group">
     <%= form.label :name %>
     <%= form.text_field :name, class: "form-control" %>
@@ -21,6 +20,8 @@
     <%= form.label :description %>
     <%= form.text_area :description, class: "form-control" %>
   </div>
+
+  <%= render PeopleRuleBuilderComponent.new(account: @account || Account.first) %>
 
   <div class="actions">
     <%= form.submit "Save Goal", class: "btn btn-primary" %>
