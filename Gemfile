@@ -20,6 +20,7 @@ gem "view_component"
 
 group :development, :test do
   gem "brakeman", require: false
+  gem "fabrication"
   gem "pry-rails"
   gem "rubocop-rails-omakase", require: false
 end
@@ -37,7 +38,6 @@ end
 
 group :test do
   gem "capybara"
-  gem "fabrication"
   gem "rails-controller-testing"
   gem "selenium-webdriver"
   gem "simplecov", require: false
