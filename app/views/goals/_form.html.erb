@@ -21,7 +21,10 @@
     <%= form.text_area :description, class: "form-control" %>
   </div>
 
-  <%= render PeopleRuleBuilderComponent.new(account: @account || Account.first) %>
+  <%= render PeopleRuleBuilderComponent.new(
+    account: @current_account,
+    traits: @traits,
+    client_applications: @current_account.client_applications) %>
 
   <div class="actions">
     <%= form.submit "Save Goal", class: "btn btn-primary" %>

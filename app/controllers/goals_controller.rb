@@ -49,7 +49,7 @@ class GoalsController < ApplicationController
       .where(client_application_traits: {
         client_application_id: @current_account.client_applications.ids
       })
-        .select(:id, :name, :client_application_id).distinct
+        .select(:id, :name, :value_type, :client_application_id).distinct
   end
 
   def goal_params
