@@ -1,0 +1,44 @@
+<% if f %>
+  <!-- Rendering with form builder `f` -->
+  <div class="nested-fields">
+    <%= f.hidden_field :id %>
+    <%= f.hidden_field :state %>
+    <%= f.hidden_field :_destroy %>
+
+    <!-- Operator Field -->
+    <div class="form-group">
+      <%= f.label :operator %>
+      <%= f.select :operator, [ [ "", nil ], [ "AND", "AND" ], [ "OR", "OR" ], [ "NOT", "NOT" ] ] %>
+    </div>
+
+    <!-- Fields for the associated Rule -->
+    <%= f.fields_for :rule do |rule_fields| %>
+      <%= render 'rules/person_form', f: rule_fields, traits: traits, client_application_options: client_application_options, state: state %>
+    <% end %>
+
+    <%= link_to "Remove", '#', class: "btn btn-danger", data: { action: "remove-fields#remove" } %>
+  </div>
+<% else %>
+  <!-- Rendering without form builder `f` -->
+  <%= form_builder = @goal.goal_rules.build(state: state).tap { |gr| gr.build_rule } %>
+  <%= fields_for "goal[goal_rules_attributes][]", form_builder do |goal_rule_fields| %>
+    <div class="nested-fields">
+      <%= goal_rule_fields.hidden_field :id %>
+      <%= goal_rule_fields.hidden_field :state %>
+      <%= goal_rule_fields.hidden_field :_destroy %>
+
+      <!-- Operator Field -->
+      <div class="form-group">
+        <%= goal_rule_fields.label :operator %>
+        <%= goal_rule_fields.select :operator, [ [ "", nil ], [ "AND", "AND" ], [ "OR", "OR" ], [ "NOT", "NOT" ] ] %>
+      </div>
+
+      <!-- Fields for the associated Rule -->
+      <%= goal_rule_fields.fields_for :rule do |rule_fields| %>
+        <%= render 'rules/person_form', f: rule_fields, traits: traits, client_application_options: client_application_options, state: state %>
+      <% end %>
+
+      <%= link_to "Remove", '#', class: "btn btn-danger", data: { action: "remove-fields#remove" } %>
+    </div>
+  <% end %>
+<% end %>

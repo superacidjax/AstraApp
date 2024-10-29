@@ -8,7 +8,13 @@ Rails.application.routes.draw do
   # health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  resources :goals
+
+  resources :goals do
+    collection do
+      get 'add_initial_state_goal_rules', to: 'goals#add_initial_state_goal_rule', as: :add_initial_state_goal_rules
+      get 'add_end_state_goal_rules', to: 'goals#add_end_state_goal_rule', as: :add_end_state_goal_rules
+    end
+  end
 
   namespace :api do
     namespace :v1 do

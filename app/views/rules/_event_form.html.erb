@@ -1,0 +1,19 @@
+<!-- app/views/rules/_event_form.html.erb -->
+<div class="rule-item">
+  <%= hidden_field_tag "goal[#{state}_state][rules][][id]", rule.id %>
+  <%= hidden_field_tag "goal[#{state}_state][rules][][rule_type]", "event" %>
+
+  <div>
+    <%= label_tag "goal[#{state}_state][rules][][name]", "Event Rule Name" %><br>
+    <%= text_field_tag "goal[#{state}_state][rules][][name]", rule.name %>
+  </div>
+
+  <!-- Additional fields specific to event rules will go here -->
+
+  <% unless @is_last_item %>
+    <div>
+      <%= label_tag "goal[#{state}_state][rules][][operator]", "Operator" %><br>
+      <%= select_tag "goal[#{state}_state][rules][][operator]", options_for_select([ "AND", "OR", "NOT" ]) %>
+    </div>
+  <% end %>
+</div>

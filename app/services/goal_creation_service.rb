@@ -54,12 +54,15 @@ class GoalCreationService
 
   # Create Rule and store GoalRule
   def create_rule(item, state, parent_group)
+    raise "Data missing for rule '#{item['name']}'" if item["data"].blank?
+
     rule = Rule.new(
       name: item["name"],
       account: @goal.account,
       ruleable: resolve_ruleable(item["ruleable"]),
       data: item["data"]
     )
+
     @rules << rule
     @goal_rules << GoalRule.new(goal: @goal, rule: rule, state: state)
   end
@@ -71,6 +74,7 @@ class GoalCreationService
 
   # Insert all records using batch insert
   def insert_records
+    binding.pry
     Rule.import @rules
     GoalRuleGroup.import @goal_rule_groups
     GoalRule.import @goal_rules
@@ -88,9 +92,9 @@ class GoalCreationService
   # Preload traits and properties to avoid redundant lookups
   def resolve_ruleable(ruleable_data)
     if ruleable_data["type"] == "trait"
-      Trait.find_by(value_type: ruleable_data["value_type"])
+      Trait.find(ruleable_data["id"])
     elsif ruleable_data["type"] == "property"
-      Property.find_by(value_type: ruleable_data["value_type"])
+      Property.find(ruleable_data["id"])
     end
   end
 end

@@ -1,0 +1,3 @@
+<%= turbo_stream.append "#{@state}_rules" do %>
+  <%= render "goals/rules/#{@rule_type}_rule_fields", state: @state, client_application_options: @client_applications, traits: @traits %>
+<% end %>

@@ -1,52 +1,142 @@
-<div data-controller="people-rule-builder" data-people-rule-builder-traits-value="<%= @traits.to_json(only: [ :id, :name, :client_application_id, :value_type ]) %>">
+<div
+  data-controller="people-rule-builder"
+  data-people-rule-builder-traits-value="<%= @traits.to_json %>"
+  data-people-rule-builder-state-value="<%= state %>">
+
   <div class="form-group">
-    <label for="rule_name">Rule Name</label>
-    <input type="text" id="rule_name" name="rule[name]" class="form-control">
+    <label for="rule_name_<%= state %>">Rule Name</label>
+    <%= form_builder.text_field :name, class: "form-control",
+                                id: "rule_name_#{state}" %>
   </div>
 
   <div class="form-group">
-    <label for="client_applications">Client Application</label>
-    <select id="client_applications" name="rule[client_application_ids][]" 
-      class="form-control" multiple 
-      data-people-rule-builder-target="clientApplications" 
-      data-action="change->people-rule-builder#filterTraits">
-      <option value="all">All Applications</option>
-      <% client_applications.each do |client_app| %>
-        <option value="<%= client_app.id %>">
-          <%= client_app.name %>
-        </option>
-      <% end %>
-    </select>
+    <label for="client_applications_<%= state %>">Client Application</label>
+    <%= form_builder.select(
+      "rule[client_application_ids][]",
+      options_for_select(client_application_options, selected: "all"),
+      {},
+      { multiple: true,
+        class: "form-control",
+        id: "client_applications_#{state}",
+        data: { action: "change->people-rule-builder#filterTraits" },
+        data_people_rule_builder_target: "clientApplications"
+      }
+    ) %>
   </div>
 
   <div class="form-group">
-    <label for="traits">Trait</label>
-    <select id="traits" name="rule[trait_id]" class="form-control" 
-      data-people-rule-builder-target="traitSelector"
-      data-action="change->people-rule-builder#updateOperator">
-      <option value="">Select a trait</option>
-    </select>
+    <label for="traits_<%= state %>">Trait</label>
+    <%= form_builder.select(
+      "rule[trait_id]",
+      options_for_select([]),
+      { include_blank: true },
+      { class: "form-control",
+        id: "traits_#{state}",
+        data_people_rule_builder_target: "traitSelector",
+        data: { action: "change->people-rule-builder#updateOperator" }
+      }
+    ) %>
   </div>
 
-  <!-- Operator Dropdown, fixed target reference -->
   <div class="form-group" data-people-rule-builder-target="operatorGroup">
-    <label for="operator">Operator</label>
-    <select id="operator" name="rule[operator]" class="form-control" 
-      data-people-rule-builder-target="operatorSelector"> <!-- Make sure this target exists -->
-      <option value="">Select an operator</option>
-    </select>
+    <label for="operator_<%= state %>">Operator</label>
+    <%= form_builder.select(
+      "rule[operator]",
+      options_for_select([]),
+      { include_blank: true },
+      { class: "form-control",
+        id: "operator_#{state}",
+        data_people_rule_builder_target: "operatorSelector"
+      }
+    ) %>
   </div>
 
   <!-- Case sensitive checkbox, only for text traits -->
-  <div class="form-group" data-people-rule-builder-target="caseSensitiveGroup" style="display: none;">
-    <label for="case_sensitive">Case sensitive</label>
-    <input type="checkbox" id="case_sensitive" name="rule[case_sensitive]" value="true">
+  <div class="form-group" data-people-rule-builder-target="caseSensitiveGroup"
+       style="display: none;">
+    <label for="case_sensitive_<%= state %>">Case sensitive</label>
+    <%= form_builder.check_box "rule[case_sensitive]",
+                               id: "case_sensitive_#{state}" %>
   </div>
 
-  <!-- Input fields depending on operator -->
-  <div class="form-group" data-people-rule-builder-target="valueInputGroup">
-    <!-- Placeholder for dynamic fields -->
+  <!-- Text input group -->
+  <div class="form-group" data-people-rule-builder-target="textInputGroup"
+       style="display: none;">
+    <label for="value_text_<%= state %>">Value (Text)</label>
+    <%= form_builder.text_field "rule[value]",
+                                class: "form-control",
+                                id: "value_text_#{state}" %>
   </div>
 
-  <button type="submit" class="btn btn-primary">Save Rule</button>
+  <!-- Numeric input group -->
+  <div class="form-group" data-people-rule-builder-target="numericInputGroup"
+       style="display: none;">
+    <label for="value_numeric_<%= state %>">Value (Numeric)</label>
+    <%= form_builder.number_field "rule[value]",
+                                  class: "form-control",
+                                  id: "value_numeric_#{state}" %>
+  </div>
+
+  <!-- Numeric range input group -->
+  <div class="form-group" data-people-rule-builder-target="numericRangeGroup"
+       style="display: none;">
+    <label for="from_value_numeric_<%= state %>">From</label>
+    <%= form_builder.number_field "rule[from]",
+                                  class: "form-control",
+                                  id: "from_value_numeric_#{state}" %>
+
+    <label for="to_value_numeric_<%= state %>">To</label>
+    <%= form_builder.number_field "rule[to]",
+                                  class: "form-control",
+                                  id: "to_value_numeric_#{state}" %>
+
+    <div class="form-group">
+      <label for="inclusive_<%= state %>">Values inclusive</label>
+      <%= form_builder.check_box "rule[inclusive]",
+                                 id: "inclusive_#{state}" %>
+    </div>
+  </div>
+
+  <!-- Boolean input group -->
+  <div class="form-group" data-people-rule-builder-target="booleanInputGroup"
+       style="display: none;">
+    <label for="boolean_value_<%= state %>">Value (Boolean)</label>
+    <%= form_builder.select(
+      "rule[boolean_value]",
+      options_for_select([ [ "True", true ], [ "False", false ] ]),
+      { include_blank: true },
+      { class: "form-control",
+        id: "boolean_value_#{state}"
+      }
+    ) %>
+  </div>
+
+  <!-- Datetime input group -->
+  <div class="form-group" data-people-rule-builder-target="datetimeInputGroup"
+       style="display: none;">
+    <label for="datetime_value_<%= state %>">Value (Datetime)</label>
+    <%= form_builder.datetime_local_field "rule[value]",
+                                          class: "form-control",
+                                          id: "datetime_value_#{state}" %>
+  </div>
+
+  <!-- Datetime range input group -->
+  <div class="form-group" data-people-rule-builder-target="datetimeRangeGroup"
+       style="display: none;">
+    <label for="datetime_from_value_<%= state %>">From</label>
+    <%= form_builder.datetime_local_field "rule[from]",
+                                          class: "form-control",
+                                          id: "datetime_from_value_#{state}" %>
+
+    <label for="datetime_to_value_<%= state %>">To</label>
+    <%= form_builder.datetime_local_field "rule[to]",
+                                          class: "form-control",
+                                          id: "datetime_to_value_#{state}" %>
+
+    <div class="form-group">
+      <label for="datetime_inclusive_<%= state %>">Values inclusive</label>
+      <%= form_builder.check_box "rule[inclusive]",
+                                 id: "datetime_inclusive_#{state}" %>
+    </div>
+  </div>
 </div>

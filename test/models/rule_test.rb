@@ -121,7 +121,7 @@ class RuleTest < ActiveSupport::TestCase
   # ## Good below this line
   test "should be invalid without 'from' or 'to' for within range operator" do
     rule.ruleable = numeric_property
-    rule.property_operator = "Within range"
+    rule.property_operator = "within_range"
 
     # Scenario 1: Missing 'from' value
     rule.property_from = nil
@@ -355,7 +355,7 @@ class RuleTest < ActiveSupport::TestCase
   # Numeric trait tests
   test "should validate numeric person rule with greater than operator" do
     rule.ruleable = numeric_trait
-    rule.trait_operator = "Greater than"
+    rule.trait_operator = "greater_than"
     rule.trait_value = "30"
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value }.stringify_keys
@@ -366,7 +366,7 @@ class RuleTest < ActiveSupport::TestCase
 
   test "should validate numeric person rule within range" do
     rule.ruleable = numeric_trait
-    rule.trait_operator = "Within range"
+    rule.trait_operator = "within_range"
     rule.trait_from = "20"
     rule.trait_to = "30"
     rule.trait_inclusive = true
@@ -382,7 +382,7 @@ class RuleTest < ActiveSupport::TestCase
   # Text trait tests
   test "should validate text person rule with equals operator" do
     rule.ruleable = text_trait
-    rule.trait_operator = "Equals"
+    rule.trait_operator = "equals"
     rule.trait_value = "Some Text"
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value,
@@ -394,7 +394,7 @@ class RuleTest < ActiveSupport::TestCase
 
   test "should validate text person rule with contains operator" do
     rule.ruleable = text_trait
-    rule.trait_operator = "Contains"
+    rule.trait_operator = "contains"
     rule.trait_value = "Text"
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value,
@@ -407,7 +407,7 @@ class RuleTest < ActiveSupport::TestCase
   # Boolean trait tests
   test "should validate boolean person rule with is operator" do
     rule.ruleable = boolean_trait
-    rule.trait_operator = "Is"
+    rule.trait_operator = "is"
     rule.trait_value = true
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value }.stringify_keys
@@ -419,7 +419,7 @@ class RuleTest < ActiveSupport::TestCase
   # Datetime trait tests
   test "should validate datetime person rule with before operator" do
     rule.ruleable = datetime_trait
-    rule.trait_operator = "Before"
+    rule.trait_operator = "before"
     rule.trait_value = "2023-10-25T23:48:46+00:00"
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value }.stringify_keys
@@ -430,7 +430,7 @@ class RuleTest < ActiveSupport::TestCase
 
   test "should validate datetime person rule within range" do
     rule.ruleable = datetime_trait
-    rule.trait_operator = "Within range"
+    rule.trait_operator = "within_range"
     rule.trait_from = "2023-01-01T00:00:00+00:00"
     rule.trait_to = "2023-12-31T23:59:59+00:00"
     rule.trait_inclusive = true
@@ -456,7 +456,7 @@ class RuleTest < ActiveSupport::TestCase
 
   test "should be invalid with invalid range for numeric" do
     rule.ruleable = numeric_trait
-    rule.trait_operator = "Within range"
+    rule.trait_operator = "within_range"
     rule.trait_inclusive = true
     rule.data = { trait_operator: rule.trait_operator,
                   trait_inclusive: rule.trait_inclusive }.stringify_keys
@@ -481,7 +481,7 @@ class RuleTest < ActiveSupport::TestCase
 
   test "should be invalid with invalid datetime format for before operator" do
     rule.ruleable = datetime_trait
-    rule.trait_operator = "Before"
+    rule.trait_operator = "before"
     rule.trait_value = "invalid-datetime"
     rule.data = { trait_operator: rule.trait_operator,
                   trait_value: rule.trait_value }.stringify_keys

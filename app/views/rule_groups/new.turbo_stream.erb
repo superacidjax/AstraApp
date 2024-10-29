@@ -1,0 +1,10 @@
+<!-- app/views/rule_groups/new.turbo_stream.erb -->
+<% if @parent_group_id.present? %>
+  <%= turbo_stream.append "rule-group-#{@parent_group_id}-items" do %>
+    <%= render partial: "rule_groups/form", locals: { rule_group: @rule_group, state: @state } %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.append "#{@state}-state-items" do %>
+    <%= render partial: "rule_groups/form", locals: { rule_group: @rule_group, state: @state } %>
+  <% end %>
+<% end %>

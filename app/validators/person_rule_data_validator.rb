@@ -1,9 +1,9 @@
 class PersonRuleDataValidator < ActiveModel::Validator
   ALLOWED_OPERATORS = {
-    "numeric" => [ "Greater than", "Less than", "Equal to", "Within range" ],
-    "text" => [ "Equals", "Not equals", "Contains", "Does not contain" ],
-    "boolean" => [ "Is", "Is not" ],
-    "datetime" => [ "Before", "After", "Within range" ]
+    "numeric" => [ "greater_than", "less_than", "equal_to", "within_range" ],
+    "text" => [ "equals", "not_equals", "contains", "does_not_contain" ],
+    "boolean" => [ "is", "is_not" ],
+    "datetime" => [ "before", "after", "within_range" ]
   }.freeze
 
   def validate(record)

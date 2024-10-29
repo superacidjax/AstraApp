@@ -1,233 +1,201 @@
+// app/javascript/controllers/people_rule_builder_controller.js
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["clientApplications", "traitSelector", "operatorSelector", "valueInputGroup", "caseSensitiveGroup"];
-  static values = { traits: Array };
+  static targets = [
+    "clientApplications",
+    "traitSelector",
+    "operatorSelector",
+    "operatorGroup",
+    "caseSensitiveGroup",
+    "textInputGroup",
+    "numericInputGroup",
+    "booleanInputGroup",
+    "datetimeInputGroup",
+    "numericRangeGroup",
+    "datetimeRangeGroup",
+  ];
+
+  static values = { traits: Array, state: String };
 
   connect() {
-    console.log("PeopleRuleBuilder connected!");
     this.allTraits = this.traitsValue;
+    this.logFormDataOnSubmit();
+  }
+
+  logFormDataOnSubmit() {
+    const form = this.element.closest("form");
+    if (form) {
+      form.addEventListener("submit", (event) => {
+        const formData = new FormData(event.target);
+        for (let [name, value] of formData) {
+          console.log(`${name}: ${value}`);
+        }
+      });
+    }
   }
 
   filterTraits() {
-    const selectedClientAppIds = Array.from(this.clientApplicationsTarget.selectedOptions).map(option => option.value);
+    const selectedClientAppIds = Array.from(
+      this.clientApplicationsTarget.selectedOptions
+    ).map((option) => option.value);
     const allOptionSelected = selectedClientAppIds.includes("all");
 
     this.clearTraitOptions();
 
     const filteredTraits = allOptionSelected
       ? this.allTraits
-      : this.allTraits.filter(trait => selectedClientAppIds.includes(trait.client_application_id));
+      : this.allTraits.filter((trait) =>
+          trait.client_application_ids.some((id) =>
+            selectedClientAppIds.includes(id.toString())
+          )
+        );
 
     this.populateTraitSelector(filteredTraits);
   }
 
   clearTraitOptions() {
-    const selectElement = this.traitSelectorTarget;
-    while (selectElement.firstChild) {
-      selectElement.removeChild(selectElement.firstChild);
-    }
-
+    this.traitSelectorTarget.innerHTML = "";
     const defaultOption = document.createElement("option");
     defaultOption.value = "";
     defaultOption.textContent = "Select a trait";
-    selectElement.appendChild(defaultOption);
+    this.traitSelectorTarget.appendChild(defaultOption);
   }
 
   populateTraitSelector(traits) {
-    const selectElement = this.traitSelectorTarget;
-
-    traits.forEach(trait => {
+    traits.forEach((trait) => {
       const option = document.createElement("option");
-      option.value = trait.id;
+      option.value = trait.id.toString();
       option.textContent = trait.name;
-      option.dataset.valueType = trait.value_type; // Store value type in option
-      selectElement.appendChild(option);
+      option.dataset.valueType = trait.value_type;
+      this.traitSelectorTarget.appendChild(option);
     });
-
-    console.log("Trait selector populated and shown");
   }
 
   updateOperator(event) {
     const selectedTraitId = event.target.value;
-    const selectedTrait = this.traitsValue.find(trait => trait.id === selectedTraitId);
 
-    if (!selectedTrait) return;
+    // Find the trait based on the selected ID
+    const selectedTrait = this.allTraits.find(
+      (trait) => trait.id.toString() === selectedTraitId
+    );
 
-    // Clear the operatorSelector target and reset it to have only a blank option initially
+    // Reset operator and dynamic inputs
+    this.clearOperatorOptions();
+    this.clearDynamicInputs();
+
+    // If no trait is found, exit early
+    if (!selectedTrait) {
+      return;
+    }
+
+    // Store the selected value type for use in handleOperatorChange
+    this.selectedValueType = selectedTrait.value_type;
+
+    let operators = [];
+
+    // Determine operators based on value_type
+    switch (this.selectedValueType) {
+      case "text":
+        operators = ["Equals", "Not equals", "Contains", "Does not contain"];
+        if (this.hasCaseSensitiveGroupTarget) {
+          this.caseSensitiveGroupTarget.style.display = "block"; // Show for text
+        }
+        break;
+      case "numeric":
+        operators = ["Greater than", "Less than", "Equal to", "Within range"];
+        break;
+      case "boolean":
+        operators = ["Is", "Is not"];
+        break;
+      case "datetime":
+        operators = ["Before", "After", "Within range"];
+        break;
+      default:
+        console.warn("Unknown value type:", this.selectedValueType);
+        this.clearDynamicInputs();
+    }
+
+    // Populate operator dropdown
+    operators.forEach((operator) => {
+      const option = document.createElement("option");
+      option.value = operator.toLowerCase().replace(/ /g, "_");
+      option.textContent = operator;
+      this.operatorSelectorTarget.appendChild(option);
+    });
+  }
+
+  clearOperatorOptions() {
     this.operatorSelectorTarget.innerHTML = "";
-
     const defaultOption = document.createElement("option");
     defaultOption.value = "";
     defaultOption.textContent = "Select an operator";
     this.operatorSelectorTarget.appendChild(defaultOption);
-
-    let operators = [];
-
-    // Determine the operators based on the trait's value_type
-    switch (selectedTrait.value_type) {
-      case "text":
-        operators = ["Equals", "Not equals", "Contains", "Does not contain"];
-        this.caseSensitiveGroupTarget.style.display = "block"; // Show case sensitive checkbox for text traits
-        break;
-      case "numeric":
-        operators = ["Greater than", "Less than", "Equal to", "Within Range"];
-        this.caseSensitiveGroupTarget.style.display = "none"; // Hide case sensitive checkbox
-        break;
-      case "boolean":
-        operators = ["Is", "Is not"];
-        this.caseSensitiveGroupTarget.style.display = "none"; // Hide case sensitive checkbox
-        break;
-      case "datetime":
-        operators = ["Before", "After", "Within range"];
-        this.caseSensitiveGroupTarget.style.display = "none"; // Hide case sensitive checkbox
-        break;
-    }
-
-    // Populate the operator dropdown
-    operators.forEach(operator => {
-      const option = document.createElement("option");
-      option.value = operator.toLowerCase().replace(" ", "_");
-      option.textContent = operator;
-      this.operatorSelectorTarget.appendChild(option);
-    });
-
-    // Attach event listener for operator change
-    this.operatorSelectorTarget.addEventListener("change", this.handleOperatorChange.bind(this));
-
-    // Clear any previously added dynamic inputs
-    this.clearDynamicInputs();
   }
 
   clearDynamicInputs() {
-    while (this.valueInputGroupTarget.firstChild) {
-      this.valueInputGroupTarget.removeChild(this.valueInputGroupTarget.firstChild);
-    }
+    const inputGroups = [
+      "textInputGroup",
+      "numericInputGroup",
+      "booleanInputGroup",
+      "datetimeInputGroup",
+      "numericRangeGroup",
+      "datetimeRangeGroup",
+    ];
+    inputGroups.forEach((group) => {
+      const targetName = `${group}Target`;
+      this.hideOptionalTarget(this[targetName]);
+    });
   }
 
-  handleOperatorChange() {
-    const selectedOperator = this.operatorSelectorTarget.value;
-    const selectedTrait = this.traitSelectorTarget.options[this.traitSelectorTarget.selectedIndex];
-    const valueType = selectedTrait.dataset.valueType;
+  handleOperatorChange(event) {
+    const selectedOperator = event.target.value;
+
+    // Ensure selectedValueType is set
+    if (!this.selectedValueType) {
+      // Find the selected trait
+      const selectedTraitId = this.traitSelectorTarget.value;
+      const selectedTrait = this.allTraits.find(
+        (trait) => trait.id.toString() === selectedTraitId
+      );
+      if (selectedTrait) {
+        this.selectedValueType = selectedTrait.value_type;
+      } else {
+        console.warn("No trait selected");
+        return;
+      }
+    }
 
     this.clearDynamicInputs();
 
-    switch (valueType) {
-      case "text":
-        this.addTextInput();
-        break;
-      case "numeric":
-        this.addNumericInput();
-        break;
-      case "boolean":
-        this.addBooleanInput();
-        break;
-      case "datetime":
-        this.addDateTimeInput();
-        break;
-    }
-  }
-
-  addTextInput() {
-    const inputElement = document.createElement("input");
-    inputElement.type = "text";
-    inputElement.name = "rule[value]";
-    inputElement.classList.add("form-control");
-    this.valueInputGroupTarget.appendChild(inputElement);
-  }
-
-  addNumericInput() {
-    const operator = this.operatorSelectorTarget.value;
-
-    if (operator === "within_range") {
-      const inputFrom = document.createElement("input");
-      inputFrom.type = "number";
-      inputFrom.name = "rule[from]";
-      inputFrom.classList.add("form-control");
-
-      const inputTo = document.createElement("input");
-      inputTo.type = "number";
-      inputTo.name = "rule[to]";
-      inputTo.classList.add("form-control");
-
-      const labelTo = document.createElement("span");
-      labelTo.textContent = " to ";
-
-      this.valueInputGroupTarget.appendChild(inputFrom);
-      this.valueInputGroupTarget.appendChild(labelTo);
-      this.valueInputGroupTarget.appendChild(inputTo);
-
-      this.addInclusiveCheckbox();
+    if (selectedOperator === "within_range") {
+      if (this.selectedValueType === "numeric") {
+        this.showOptionalTarget(this.numericRangeGroupTarget);
+      } else if (this.selectedValueType === "datetime") {
+        this.showOptionalTarget(this.datetimeRangeGroupTarget);
+      }
     } else {
-      const inputElement = document.createElement("input");
-      inputElement.type = "number";
-      inputElement.name = "rule[value]";
-      inputElement.classList.add("form-control");
-      this.valueInputGroupTarget.appendChild(inputElement);
+      if (this.selectedValueType === "numeric") {
+        this.showOptionalTarget(this.numericInputGroupTarget);
+      } else if (this.selectedValueType === "datetime") {
+        this.showOptionalTarget(this.datetimeInputGroupTarget);
+      } else if (this.selectedValueType === "text") {
+        this.showOptionalTarget(this.textInputGroupTarget);
+      } else if (this.selectedValueType === "boolean") {
+        this.showOptionalTarget(this.booleanInputGroupTarget);
+      }
     }
   }
 
-  addBooleanInput() {
-    const selectElement = document.createElement("select");
-    selectElement.name = "rule[boolean_value]";
-    selectElement.classList.add("form-control");
-
-    ["True", "False"].forEach(value => {
-      const option = document.createElement("option");
-      option.value = value.toLowerCase();
-      option.textContent = value;
-      selectElement.appendChild(option);
-    });
-
-    this.valueInputGroupTarget.appendChild(selectElement);
-  }
-
-  addDateTimeInput() {
-    const operator = this.operatorSelectorTarget.value;
-
-    if (operator === "within_range") {
-      const inputFrom = document.createElement("input");
-      inputFrom.type = "datetime-local";
-      inputFrom.name = "rule[from]";
-      inputFrom.classList.add("form-control");
-
-      const inputTo = document.createElement("input");
-      inputTo.type = "datetime-local";
-      inputTo.name = "rule[to]";
-      inputTo.classList.add("form-control");
-
-      const labelTo = document.createElement("span");
-      labelTo.textContent = " to ";
-
-      this.valueInputGroupTarget.appendChild(inputFrom);
-      this.valueInputGroupTarget.appendChild(labelTo);
-      this.valueInputGroupTarget.appendChild(inputTo);
-
-      this.addInclusiveCheckbox();
-    } else {
-      const inputElement = document.createElement("input");
-      inputElement.type = "datetime-local";
-      inputElement.name = "rule[value]";
-      inputElement.classList.add("form-control");
-      this.valueInputGroupTarget.appendChild(inputElement);
+  showOptionalTarget(target) {
+    if (target) {
+      target.style.display = "block";
     }
   }
 
-  addInclusiveCheckbox() {
-    const checkboxDiv = document.createElement("div");
-    checkboxDiv.classList.add("form-group");
-
-    const checkboxLabel = document.createElement("label");
-    checkboxLabel.textContent = "Values inclusive";
-
-    const checkboxInput = document.createElement("input");
-    checkboxInput.type = "checkbox";
-    checkboxInput.name = "rule[inclusive]";
-    checkboxInput.value = "true";
-
-    checkboxDiv.appendChild(checkboxLabel);
-    checkboxDiv.appendChild(checkboxInput);
-
-    this.valueInputGroupTarget.appendChild(checkboxDiv);
+  hideOptionalTarget(target) {
+    if (target) {
+      target.style.display = "none";
+    }
   }
 }

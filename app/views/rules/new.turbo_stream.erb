@@ -1,0 +1,11 @@
+<% container_id = "#{@state}-state-items" %>
+
+<%= turbo_stream.append container_id do %>
+  <%= render partial: 'goal_rule_fields', locals: {
+    f: nil,
+    goal_rule: @goal_rule,
+    state: @state,
+    traits: @traits,
+    client_application_options: @client_application_options
+  } %>
+<% end %>

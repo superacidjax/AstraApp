@@ -1,0 +1,172 @@
+<%# app/views/rules/_person_form.html.erb %>
+
+<% unique_id ||= SecureRandom.uuid %>
+
+<div
+  id="rule-<%= unique_id %>"
+  data-controller="people-rule-builder"
+  data-people-rule-builder-traits-value='<%= traits.map do |trait|
+    {
+      id: trait.id,
+      name: trait.name,
+      value_type: trait.value_type,
+      client_application_ids: trait.client_application_ids
+    }
+  end.to_json %>'
+  data-people-rule-builder-state-value="<%= state %>">
+
+  <!-- Rule Type (always 'Rule') -->
+  <%= f.hidden_field :type, value: "Rule" %>
+
+  <!-- Rule Name -->
+  <div class="form-group">
+    <%= f.label :name, "Rule Name", for: "rule_name_#{unique_id}" %>
+    <%= f.text_field :name,
+      class: "form-control",
+      id: "rule_name_#{unique_id}" %>
+  </div>
+
+  <!-- Client Applications -->
+  <div class="form-group">
+    <%= f.label :client_application_ids, "Client Application",
+      for: "client_applications_#{unique_id}" %>
+    <%= f.collection_select :client_application_ids, client_application_options,
+      :first, :last, {}, multiple: true,
+      class: "form-control",
+      id: "client_applications_#{unique_id}",
+      data: {
+        action: "change->people-rule-builder#filterTraits",
+        "people-rule-builder-target": "clientApplications"
+      } %>
+  </div>
+
+  <!-- Trait Selector -->
+  <div class="form-group">
+    <%= f.label :trait_id, "Trait", for: "traits_#{unique_id}" %>
+    <%= f.select :trait_id,
+      options_for_select([ [ "Select a trait", "" ] ]),
+      {}, class: "form-control",
+      id: "traits_#{unique_id}",
+      data: {
+        action: "change->people-rule-builder#updateOperator",
+        "people-rule-builder-target": "traitSelector"
+      } %>
+  </div>
+
+  <!-- Trait Operator Selector -->
+  <div class="form-group"
+    data-people-rule-builder-target="operatorGroup">
+    <%= f.label :trait_operator, "Trait Operator", for: "operator_#{unique_id}" %>
+    <%= f.select :trait_operator,
+      options_for_select([
+        [ "Select an operator", "" ],
+        [ "greater_than", "Greater than" ],
+        [ "less_than", "Less than" ],
+        [ "equal_to", "Equal to" ],
+        [ "within_range", "Within range" ]
+      ]), {}, class: "form-control",
+      id: "operator_#{unique_id}",
+      data: {
+        "people-rule-builder-target": "operatorSelector",
+        action: "change->people-rule-builder#handleOperatorChange"
+      } %>
+  </div>
+
+  <!-- Text Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="textInputGroup"
+    style="display: none;">
+    <%= f.label :trait_value_text, "Value (Text)",
+      for: "value_text_#{unique_id}" %>
+    <%= f.text_field :trait_value_text,
+      class: "form-control",
+      id: "value_text_#{unique_id}" %>
+  </div>
+
+  <!-- Numeric Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="numericInputGroup"
+    style="display: none;">
+    <%= f.label :trait_value_value, "Value (Numeric)",
+      for: "value_numeric_#{unique_id}" %>
+    <%= f.number_field :trait_value_value,
+      class: "form-control",
+      id: "value_numeric_#{unique_id}" %>
+  </div>
+
+  <!-- Numeric Range Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="numericRangeGroup"
+    style="display: none;">
+    <%= f.label :trait_value_from, "From",
+      for: "from_value_numeric_#{unique_id}" %>
+    <%= f.number_field :trait_value_from,
+      class: "form-control",
+      id: "from_value_numeric_#{unique_id}" %>
+
+    <%= f.label :trait_value_to, "To",
+      for: "to_value_numeric_#{unique_id}" %>
+    <%= f.number_field :trait_value_to,
+      class: "form-control",
+      id: "to_value_numeric_#{unique_id}" %>
+
+    <div class="form-group">
+      <%= f.label :trait_value_inclusive, "Values inclusive",
+        for: "inclusive_#{unique_id}" %>
+      <%= f.check_box :trait_value_inclusive,
+        {}, "true", "false",
+        id: "inclusive_#{unique_id}" %>
+    </div>
+  </div>
+
+  <!-- Boolean Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="booleanInputGroup"
+    style="display: none;">
+    <%= f.label :trait_value_boolean, "Value (Boolean)",
+      for: "boolean_value_#{unique_id}" %>
+    <%= f.select :trait_value_boolean,
+      options_for_select([
+        [ "Select a value", "" ],
+        [ "True", true ],
+        [ "False", false ]
+      ]), {}, class: "form-control",
+      id: "boolean_value_#{unique_id}" %>
+  </div>
+
+  <!-- Datetime Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="datetimeInputGroup"
+    style="display: none;">
+    <%= f.label :trait_value_datetime, "Value (Datetime)",
+      for: "datetime_value_<%= unique_id %>" %>
+    <%= f.datetime_local_field :trait_value_datetime,
+      class: "form-control",
+      id: "datetime_value_#{unique_id}" %>
+  </div>
+
+  <!-- Datetime Range Input Group -->
+  <div class="form-group"
+    data-people-rule-builder-target="datetimeRangeGroup"
+    style="display: none;">
+    <%= f.label :trait_value_from, "From",
+      for: "datetime_from_value_#{unique_id}" %>
+    <%= f.datetime_local_field :trait_value_from,
+      class: "form-control",
+      id: "datetime_from_value_#{unique_id}" %>
+
+    <%= f.label :trait_value_to, "To",
+      for: "datetime_to_value_#{unique_id}" %>
+    <%= f.datetime_local_field :trait_value_to,
+      class: "form-control",
+      id: "datetime_to_value_#{unique_id}" %>
+
+    <div class="form-group">
+      <%= f.label :trait_value_inclusive, "Values inclusive",
+        for: "datetime_inclusive_#{unique_id}" %>
+      <%= f.check_box :trait_value_inclusive,
+        {}, "true", "false",
+        id: "datetime_inclusive_#{unique_id}" %>
+    </div>
+  </div>
+</div>

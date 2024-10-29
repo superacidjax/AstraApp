@@ -1,0 +1,94 @@
+<html><head><style type="text/css">.turbo-progress-bar {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #0076ff;
+  z-index: 2147483647;
+  transition:
+    width 300ms ease-out,
+    opacity 150ms 150ms ease-in;
+  transform: translate3d(0, 0, 0);
+}
+</style>
+    <title>AstraGoal</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    
+
+    
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="stylesheet" href="/assets/application-0b10a24ad4d443e18a85b5f5ac7375f8941466edc0e5c10eebad54f637675a9c.css" data-turbo-track="reload">
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "application": "/assets/application-37f365cbecf1fa2810a8303f4b6571676fa1f9c56c248528bc14ddb857531b95.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-f3765a09513ca1417099ce92257ef54b9d4cf3a7addc7dcbb1d6d848d307ee8a.js",
+    "@hotwired/stimulus": "/assets/stimulus.min-dd364f16ec9504dfb72672295637a1c8838773b01c0b441bd41008124c407894.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-3576ce92b149ad5d6959438c6f291e2426c86df3b874c525b30faad51b0d96b3.js",
+    "controllers/application": "/assets/controllers/application-368d98631bccbf2349e0d4f8269afb3fe9625118341966de054759d96ea86c7e.js",
+    "controllers": "/assets/controllers/index-31a9bee606cbc5cdb1593881f388bbf4c345bf693ea24e124f84b6d5c98ab648.js",
+    "controllers/people_rule_builder_controller": "/assets/controllers/people_rule_builder_controller-6d3a0ffa5068a7c9361cdac7588499de195eeba93ff0903ecfcd9935fd13a93d.js",
+    "controllers/rules_controller": "/assets/controllers/rules_controller-d11966b0677034a5dec75eeea3a3ecabd02dcf264bb22093c0a1a237ccbaa9bb.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/application-37f365cbecf1fa2810a8303f4b6571676fa1f9c56c248528bc14ddb857531b95.js">
+<link rel="modulepreload" href="/assets/turbo.min-f3765a09513ca1417099ce92257ef54b9d4cf3a7addc7dcbb1d6d848d307ee8a.js">
+<link rel="modulepreload" href="/assets/stimulus.min-dd364f16ec9504dfb72672295637a1c8838773b01c0b441bd41008124c407894.js">
+<link rel="modulepreload" href="/assets/stimulus-loading-3576ce92b149ad5d6959438c6f291e2426c86df3b874c525b30faad51b0d96b3.js">
+<link rel="modulepreload" href="/assets/controllers/application-368d98631bccbf2349e0d4f8269afb3fe9625118341966de054759d96ea86c7e.js">
+<link rel="modulepreload" href="/assets/controllers/index-31a9bee606cbc5cdb1593881f388bbf4c345bf693ea24e124f84b6d5c98ab648.js">
+<link rel="modulepreload" href="/assets/controllers/people_rule_builder_controller-6d3a0ffa5068a7c9361cdac7588499de195eeba93ff0903ecfcd9935fd13a93d.js">
+<link rel="modulepreload" href="/assets/controllers/rules_controller-d11966b0677034a5dec75eeea3a3ecabd02dcf264bb22093c0a1a237ccbaa9bb.js">
+<script type="module">import "application"</script>
+  </head>
+
+  <body>
+    <h1>New Goal</h1>
+
+<!-- Wrap the form in a Turbo Frame to handle Turbo Stream updates -->
+<turbo-frame id="goal_form">
+  <meta name="turbo-prefetch" content="false">
+
+<form action="/goals" accept-charset="UTF-8" method="post">
+  <div>
+    <label for="goal_name">Name</label><br>
+    <input type="text" name="goal[name]" id="goal_name">
+  </div>
+
+  <div>
+    <label for="goal_description">Description</label><br>
+    <textarea name="goal[description]" id="goal_description"></textarea>
+  </div>
+
+  <div data-controller="rules">
+    <h3>Initial State</h3>
+    <div id="initial-state-items">
+      <!-- Rules and Rule Groups will be appended here dynamically -->
+    </div>
+    <div>
+      <a class="btn btn-primary" data-action="click->rules#addNewRule" data-container-id="initial-state-items" href="/rules/new.turbo_stream?rule_type=person&amp;state=initial">Add New Person Rule</a>
+    </div>
+
+    <h3>End State</h3>
+    <div id="end-state-items">
+      <!-- Rules and Rule Groups will be appended here dynamically -->
+    </div>
+    <div>
+      <a class="btn btn-primary" data-action="click->rules#addNewRule" data-container-id="end-state-items" href="/rules/new.turbo_stream?rule_type=person&amp;state=end">Add New Person Rule</a>
+    </div>
+  </div>
+
+  <input type="submit" name="commit" value="Save Goal" class="btn btn-success" data-disable-with="Save Goal">
+</form>
+</turbo-frame>
+<a class="btn btn-secondary" href="/goals">Back</a>
+
+  
+
+</body></html>

@@ -1,0 +1,12 @@
+<% if state == "initial_state" || state == "end_state" %>
+  <% if params[:rule_type] == "person" %>
+    <%= render "goals/rules/people_rule_fields", form: form, state: state,
+      client_application_options: client_application_options %>
+  <% elsif params[:rule_type] == "event" %>
+    <%= render "goals/rules/event_rule_fields", form: form, state: state,
+      client_application_options: client_application_options%>
+  <% else %>
+    <%= render "goals/rules/people_rule_fields", form: form, state: state,
+      client_application_options: client_application_options %>
+  <% end %>
+<% end %>

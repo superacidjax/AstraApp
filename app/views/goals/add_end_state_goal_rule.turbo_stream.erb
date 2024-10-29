@@ -1,0 +1,3 @@
+<%= turbo_stream.append 'end-state-items' do %>
+  <%= render 'goal_rule_fields', f: nil, goal_rule: @goal_rule, state: @state, traits: @traits, client_application_options: @client_application_options %>
+<% end %>

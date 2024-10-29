@@ -8,7 +8,7 @@ end
 Fabricator(:trait_rule, from: :rule) do
   account
   ruleable { Fabricate(:trait) }
-  data { { trait_operator: "Equals", trait_value: "some value" } }
+  data { { trait_operator: "equals", trait_value: "some value" } }
 end
 
 # rule fabricator (for property-based rule)

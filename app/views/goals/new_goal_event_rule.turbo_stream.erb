@@ -1,0 +1,4 @@
+<%= turbo_stream.append "rules" do %>
+  <%= render "goals/rules/event_rule_fields", form: form,
+    client_application_options: @client_application_options %>
+<% end %>

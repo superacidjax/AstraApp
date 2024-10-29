@@ -16,7 +16,7 @@ module GoalDataHelper
                   {
                     "type" => "rule",
                     "name" => "Rule 1",
-                    "data" => { "trait_operator" => "Equals", "trait_value" => "some value" },
+                    "data" => { "trait_operator" => "equals", "trait_value" => "some value" },
                     "ruleable" => { "type" => "trait", "value_type" => "text", "id" => trait_text.id },
                     "operator" => "AND"
                   },
@@ -36,7 +36,7 @@ module GoalDataHelper
                   {
                     "type" => "rule",
                     "name" => "Rule 3",
-                    "data" => { "trait_operator" => "Contains", "trait_value" => "keyword" },
+                    "data" => { "trait_operator" => "contains", "trait_value" => "keyword" },
                     "ruleable" => { "type" => "trait", "value_type" => "text", "id" => trait_text.id },
                     "operator" => "OR"
                   },
@@ -54,7 +54,7 @@ module GoalDataHelper
           {
             "type" => "rule",
             "name" => "Rule 5",
-            "data" => { "trait_operator" => "Is", "trait_value" => "true" },
+            "data" => { "trait_operator" => "is", "trait_value" => "true" },
             "ruleable" => { "type" => "trait", "value_type" => "boolean", "id" => trait_boolean.id },
             "operator" => nil
           }
@@ -81,7 +81,7 @@ module GoalDataHelper
                   {
                     "type" => "rule",
                     "name" => "Rule 7",
-                    "data" => { "trait_operator" => "Greater than", "trait_value" => "5" },
+                    "data" => { "trait_operator" => "greater_than", "trait_value" => "5" },
                     "ruleable" => { "type" => "trait", "value_type" => "numeric", "id" => trait_numeric.id },
                     "operator" => "AND"
                   },
@@ -103,7 +103,7 @@ module GoalDataHelper
               {
                 "type" => "rule",
                 "name" => "Rule 9",
-                "data" => { "trait_operator" => "Not equals", "trait_value" => "some other value" },
+                "data" => { "trait_operator" => "not_equals", "trait_value" => "some other value" },
                 "ruleable" => { "type" => "trait", "value_type" => "text", "id" => trait_text.id },
                 "operator" => "OR"
               },
@@ -115,7 +115,7 @@ module GoalDataHelper
                   {
                     "type" => "rule",
                     "name" => "Rule 10",
-                    "data" => { "trait_operator" => "Is not", "trait_value" => "false" },
+                    "data" => { "trait_operator" => "is_not", "trait_value" => "false" },
                     "ruleable" => { "type" => "trait", "value_type" => "boolean", "id" => trait_boolean.id },
                     "operator" => "AND"
                   },

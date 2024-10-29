@@ -1,0 +1,93 @@
+<%= form.fields_for "goal[rules_attributes][#{form.object.object_id || 'new_rule'}]", form.object do |ff| %>
+  <fieldset id="<%= turbo_id_for(form.object) %>">
+    <legend>Person-Based Rule</legend>
+
+    <div class="form-group">
+      <%= ff.label :name, "Rule Name" %>
+      <%= ff.text_field :name, class: "form-control", id: "rule_name_#{state}" %>
+    </div>
+
+    <div class="form-group">
+      <%= ff.label :client_application_ids, "Client Application" %>
+      <%= ff.select :client_application_ids, options_for_select(client_application_options, selected: "all"), {}, { multiple: true, class: "form-control" } %>
+    </div>
+
+    <div class="form-group">
+      <label for="traits_<%= state %>">Trait</label>
+      <%= ff.select "rule[trait_id]",
+        options_for_select([]),
+        { include_blank: true },
+        { class: "form-control", id: "traits_#{state}" } %>
+    </div>
+
+    <div class="form-group" data-people-rule-builder-target="operatorGroup">
+      <label for="operator_<%= state %>">Operator</label>
+      <%= ff.select "rule[operator]",
+        options_for_select([]),
+        { include_blank: true },
+        { class: "form-control", id: "operator_#{state}" } %>
+    </div>
+
+    <!-- Case sensitive checkbox, only for text traits -->
+    <div class="form-group" data-people-rule-builder-target="caseSensitiveGroup" style="display: none;">
+      <label for="case_sensitive_<%= state %>">Case sensitive</label>
+      <%= ff.check_box "rule[case_sensitive]", id: "case_sensitive_#{state}" %>
+    </div>
+
+    <!-- Text input group -->
+    <div class="form-group" data-people-rule-builder-target="textInputGroup" style="display: none;">
+      <label for="value_text_<%= state %>">Value (Text)</label>
+      <%= ff.text_field "rule[value]", class: "form-control", id: "value_text_#{state}" %>
+    </div>
+
+    <!-- Numeric input group -->
+    <div class="form-group" data-people-rule-builder-target="numericInputGroup" style="display: none;">
+      <label for="value_numeric_<%= state %>">Value (Numeric)</label>
+      <%= ff.number_field "rule[value]", class: "form-control", id: "value_numeric_#{state}" %>
+    </div>
+
+    <!-- Numeric range input group -->
+    <div class="form-group" data-people-rule-builder-target="numericRangeGroup" style="display: none;">
+      <label for="from_value_numeric_<%= state %>">From</label>
+      <%= ff.number_field "rule[from]", class: "form-control", id: "from_value_numeric_#{state}" %>
+
+      <label for="to_value_numeric_<%= state %>">To</label>
+      <%= ff.number_field "rule[to]", class: "form-control", id: "to_value_numeric_#{state}" %>
+
+      <div class="form-group">
+        <label for="inclusive_<%= state %>">Values inclusive</label>
+        <%= ff.check_box "rule[inclusive]", id: "inclusive_#{state}" %>
+      </div>
+    </div>
+
+    <!-- Boolean input group -->
+    <div class="form-group" data-people-rule-builder-target="booleanInputGroup" style="display: none;">
+      <label for="boolean_value_<%= state %>">Value (Boolean)</label>
+      <%= ff.select "rule[boolean_value]",
+        options_for_select([["True", true], ["False", false]]),
+        { include_blank: true },
+        { class: "form-control", id: "boolean_value_#{state}" } %>
+    </div>
+
+    <!-- Datetime input group -->
+    <div class="form-group" data-people-rule-builder-target="datetimeInputGroup" style="display: none;">
+      <label for="datetime_value_<%= state %>">Value (Datetime)</label>
+      <%= ff.datetime_local_field "rule[value]", class: "form-control", id: "datetime_value_#{state}" %>
+    </div>
+
+    <!-- Datetime range input group -->
+    <div class="form-group" data-people-rule-builder-target="datetimeRangeGroup" style="display: none;">
+      <label for="datetime_from_value_<%= state %>">From</label>
+      <%= ff.datetime_local_field "rule[from]", class: "form-control", id: "datetime_from_value_#{state}" %>
+
+      <label for="datetime_to_value_<%= state %>">To</label>
+      <%= ff.datetime_local_field "rule[to]", class: "form-control", id: "datetime_to_value_#{state}" %>
+
+      <div class="form-group">
+        <label for="datetime_inclusive_<%= state %>">Values inclusive</label>
+        <%= ff.check_box "rule[inclusive]", id: "datetime_inclusive_#{state}" %>
+      </div>
+    </div>
+    <%= button_to "Delete Rule", form.object.id ? rule_path(form.object.id) : "#", method: :delete, form: { "data-turbo-confirm": "Are you sure?" }, class: "btn btn-danger" %>
+  </fieldset
+<% end %>

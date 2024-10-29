@@ -4,4 +4,6 @@ class GoalRule < ApplicationRecord
 
   enum :state, { initial: 1, end: 3 }
   validates :state, presence: true
+
+  accepts_nested_attributes_for :rule
 end
