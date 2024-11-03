@@ -5,8 +5,25 @@ class RuleTest < ActiveSupport::TestCase
     @account ||= Fabricate(:account)
   end
 
+<<<<<<< Updated upstream
   def rule
     @rule ||= Fabricate.build(:rule, account: account)
+=======
+  test "has many goal_rules" do
+    association = Rule.reflect_on_association(:goal_rules)
+    assert_equal :has_many, association.macro
+  end
+
+  test "has many goals through goal_rules" do
+    association = Rule.reflect_on_association(:goals)
+    assert_equal :has_many, association.macro
+    assert_equal :goal_rules, association.options[:through]
+  end
+
+  test "should not save rule without name" do
+    rule = Rule.new(account: @account)
+    assert_not rule.save, "Saved the rule without a name"
+>>>>>>> Stashed changes
   end
 
   # Helper methods for property rules
@@ -14,8 +31,21 @@ class RuleTest < ActiveSupport::TestCase
     @numeric_property ||= Fabricate(:property, value_type: "numeric")
   end
 
+<<<<<<< Updated upstream
   def text_property
     @text_property ||= Fabricate(:property, value_type: "text")
+=======
+  test "should not save rule without rule_data" do
+    rule = Rule.new(account: @account)
+    assert_not rule.save, "Saved the rule without a rule_data"
+  end
+
+
+  test "should have validation error on name when name is missing" do
+    rule = Rule.new(account: @account)
+    assert rule.invalid?, "Rule without a name should be invalid"
+    assert rule.errors[:name].any?, "There should be an error for the name"
+>>>>>>> Stashed changes
   end
 
   def boolean_property
@@ -26,6 +56,7 @@ class RuleTest < ActiveSupport::TestCase
     @datetime_property ||= Fabricate(:property, value_type: "datetime")
   end
 
+<<<<<<< Updated upstream
   # Helper methods for trait rules
   def numeric_trait
     @numeric_trait ||= Fabricate(:trait, account: account, value_type: "numeric")
@@ -489,5 +520,11 @@ class RuleTest < ActiveSupport::TestCase
     assert_not rule.valid?, "Rule should be invalid with invalid datetime format"
     assert_includes rule.errors[:trait_value],
       "Value must be a valid ISO8601 datetime string"
+=======
+  test "should save rule with duplicate name in different accounts" do
+    different_account = accounts(:two)
+    rule_with_duplicate_name = Rule.new(account: different_account, name: @rule.name, rule_data: "test")
+    assert rule_with_duplicate_name.save, "Did not save the rule with a duplicate name in a different account"
+>>>>>>> Stashed changes
   end
 end

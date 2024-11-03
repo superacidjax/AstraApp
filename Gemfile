@@ -9,6 +9,7 @@ gem "good_job"
 gem "importmap-rails"
 gem "jsonb_accessor"
 gem "ostruct"
+<<<<<<< Updated upstream
 gem "pg", "~> 1.5"
 gem "puma", ">= 5.0"
 gem "redis", ">= 4.0.1"
@@ -16,6 +17,10 @@ gem "sprockets-rails"
 gem "stimulus-rails"
 gem "turbo-rails"
 gem "uuid7"
+=======
+gem "good_job"
+gem "decent_exposure"
+>>>>>>> Stashed changes
 gem "view_component"
 
 group :development, :test do

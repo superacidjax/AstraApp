@@ -1,0 +1,9 @@
+one:
+  account: one
+  success_rate: 9.99
+  name: SomeAwesomeGoal
+
+two:
+  account: two
+  success_rate: 9.99
+  name: anotherAwesomeGoal

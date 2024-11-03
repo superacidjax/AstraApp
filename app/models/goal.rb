@@ -10,10 +10,16 @@ class Goal < ApplicationRecord
 
   validates :name, presence: true
   validates :success_rate, presence: true, numericality: true
+<<<<<<< Updated upstream
   validates :data, presence: true
   validates_with GoalDataValidator
 
   jsonb_accessor :data,
     initial_state: :jsonb,
     end_state: :jsonb
+=======
+  validates :name, presence: true
+
+  accepts_nested_attributes_for :goal_rules, allow_destroy: true
+>>>>>>> Stashed changes
 end

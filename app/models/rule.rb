@@ -9,6 +9,7 @@ class Rule < ApplicationRecord
   has_many :rule_groups, through: :rule_group_rules
 
   validates :name, presence: true, uniqueness: { scope: :account_id }
+<<<<<<< Updated upstream
   validates :data, presence: true
   validates_with EventRuleDataValidator, if: :event_rule?
   validates_with PersonRuleDataValidator, if: :person_rule?
@@ -44,4 +45,7 @@ class Rule < ApplicationRecord
   def person_rule?
     ruleable_type == "Trait"
   end
+=======
+  validates :rule_data, presence: true
+>>>>>>> Stashed changes
 end

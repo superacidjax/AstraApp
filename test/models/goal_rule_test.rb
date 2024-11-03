@@ -7,6 +7,27 @@ class GoalRuleTest < ActiveSupport::TestCase
     @goal_rule = Fabricate(:goal_rule, goal: @goal, rule: @trait_rule)
   end
 
+  test "belongs to goal" do
+    association = GoalRule.reflect_on_association(:goal)
+    assert_equal :belongs_to, association.macro
+  end
+
+  test "belongs to rule" do
+    association = GoalRule.reflect_on_association(:rule)
+    assert_equal :belongs_to, association.macro
+  end
+
+  test "state enum includes initial and end" do
+    assert_includes GoalRule.states.keys, "initial"
+    assert_includes GoalRule.states.keys, "end"
+  end
+
+  test "accepts nested attributes for rule" do
+    options = GoalRule.nested_attributes_options[:rule]
+    assert_not_nil options, "GoalRule should accept nested attributes for rule"
+    # Check for any specific options if needed
+  end
+
   test "should not save goal rule without state" do
     goal_rule = Fabricate.build(:goal_rule, goal: @goal, rule: @trait_rule, state: nil)
     assert_not goal_rule.save, "Saved the goal rule without a state"

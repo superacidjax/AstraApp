@@ -1,0 +1,9 @@
+one:
+  account: one
+  name: rule One
+  rule_data: { event: "Screening Scheduled" }
+
+two:
+  account: two
+  name: rule Two
+  rule_data: { event: "User Sign Up" }

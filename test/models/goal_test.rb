@@ -32,6 +32,24 @@ class GoalTest < ActiveSupport::TestCase
     assert goal.valid?, "Fixture goal is not valid"
   end
 
+  test "has many goal_rules with dependent destroy" do
+    association = Goal.reflect_on_association(:goal_rules)
+    assert_equal :has_many, association.macro
+    assert_equal :destroy, association.options[:dependent]
+  end
+
+  test "has many rules through goal_rules" do
+    association = Goal.reflect_on_association(:rules)
+    assert_equal :has_many, association.macro
+    assert_equal :goal_rules, association.options[:through]
+  end
+
+  test "accepts nested attributes for goal_rules with allow_destroy" do
+    options = Goal.nested_attributes_options[:goal_rules]
+    assert_not_nil options, "Goal should accept nested attributes for goal_rules"
+    assert_equal true, options[:allow_destroy], "Goal should allow destroy for goal_rules"
+  end
+
   test "should not save goal without success_rate" do
     goal = Fabricate.build(:goal, data: valid_goal_data, success_rate: nil)
     assert_not goal.save, "Saved the goal without a success_rate"
@@ -39,6 +57,12 @@ class GoalTest < ActiveSupport::TestCase
 
   test "should have validation error on name when name is missing" do
     goal = Fabricate.build(:goal, data: valid_goal_data, name: "")
+    assert goal.invalid?, "Goal without a name should be invalid"
+    assert goal.errors[:name].any?, "There should be an error for the name"
+  end
+
+  test "should have validation error on name when name is missing" do
+    goal = Goal.new(name: "")
     assert goal.invalid?, "Goal without a name should be invalid"
     assert goal.errors[:name].any?, "There should be an error for the name"
   end

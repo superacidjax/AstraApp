@@ -102,6 +102,8 @@ GEM
       rexml
     crass (1.0.6)
     date (3.3.4)
+    decent_exposure (3.0.4)
+      activesupport (>= 4.0)
     docile (1.4.1)
     drb (2.2.1)
     erubi (1.13.0)
@@ -323,7 +325,11 @@ GEM
     useragent (0.16.10)
     uuid7 (0.2.0)
       zeitwerk (~> 2.4)
+<<<<<<< Updated upstream
     view_component (3.16.0)
+=======
+    view_component (3.15.1)
+>>>>>>> Stashed changes
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
@@ -358,7 +364,11 @@ DEPENDENCIES
   bootsnap
   brakeman
   capybara
+<<<<<<< Updated upstream
   fabrication
+=======
+  decent_exposure
+>>>>>>> Stashed changes
   good_job
   importmap-rails
   jsonb_accessor

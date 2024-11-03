@@ -5,6 +5,7 @@ ENV["RAILS_ENV"] ||= "test"
 Dir[File.expand_path("support/**/*.rb", __dir__)].each { |file| require file }
 require_relative "../config/environment"
 require "rails/test_help"
+require "view_component/test_case"
 
 module ActiveSupport
   class TestCase

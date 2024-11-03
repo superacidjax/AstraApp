@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "goals/new"
+  get "goal/new"
   get "static_pages/home"
   root "static_pages#home"
 
@@ -7,7 +9,6 @@ Rails.application.routes.draw do
 
   # health check
   get "up" => "rails/health#show", as: :rails_health_check
-
 
   resources :goals do
     collection do
@@ -21,6 +22,7 @@ Rails.application.routes.draw do
       post "people", to: "people#create"
       post "events", to: "events#create"
     end
+    resources :goals
   end
 
   # Render dynamic PWA files from app/views/pwa/*
