@@ -1,0 +1,17 @@
+<!-- app/views/goals/_goal_rule_group_fields.html.erb -->
+<div class="rule-group" data-rule-group>
+  <%= f.hidden_field :state, value: state %>
+  <div class="form-group">
+    <%= f.label :name, "Group Name" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="rules">
+    <%= f.fields_for :rules do |rule_form| %>
+      <%= render "rule_fields", f: rule_form %>
+    <% end %>
+  </div>
+
+  <%= link_to "Add Nested Rule Group", "#", class: "btn btn-secondary", data: { action: "goal-form#addNestedRuleGroup" } %>
+  <%= link_to "Add Rule", "#", class: "btn btn-secondary", data: { action: "goal-form#addRule" } %>
+</div>

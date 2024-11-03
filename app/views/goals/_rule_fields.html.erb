@@ -1,0 +1,15 @@
+<!-- app/views/goals/_rule_fields.html.erb -->
+<div class="rule" data-rule>
+  <%= f.hidden_field :type, value: "Rule" %>
+  <div class="form-group">
+    <%= f.label :name, "Rule Name" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <%= render "rules/person_form", f: f %>
+
+  <div class="form-group">
+    <%= f.label :operator, "Operator" %>
+    <%= f.select :operator, options_for_select([["", ""], ["AND", "AND"], ["OR", "OR"], ["NOT", "NOT"]]), {}, class: "form-control" %>
+  </div>
+</div>

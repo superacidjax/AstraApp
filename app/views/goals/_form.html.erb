@@ -1,17 +1,15 @@
-<% if @goal.errors.any? %>
-  <div id="error_explanation">
-    <h2><%= pluralize(@goal.errors.count, "error") %> prohibited this goal from being saved:</h2>
+<%= form_with(model: @goal, data: { controller: "goal-form" }, id: "goal_form") do |form| %>
+  <% if @goal.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@goal.errors.count, "error") %> prohibited this goal from being saved:</h2>
+      <ul>
+        <% @goal.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-    <ul>
-      <% @goal.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<%= form_with(model: @goal, local: true, id: "goal_form") do |form| %>
-  <!-- Your form fields go here -->
   <div class="form-group">
     <%= form.label :name %>
     <%= form.text_field :name, class: "form-control" %>
@@ -20,6 +18,53 @@
   <div class="form-group">
     <%= form.label :description %>
     <%= form.text_area :description, class: "form-control" %>
+  </div>
+
+  <h3>Initial State</h3>
+  <div id="initial_state" data-goal-form-target="rulesContainer">
+    <!-- Existing rules and rule groups will be rendered here -->
+  </div>
+  <%= link_to "Add Rule", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRule" } %>
+  <%= link_to "Add Rule Group", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRuleGroup" } %>
+
+  <h3>End State</h3>
+  <div id="end_state" data-goal-form-target="ruleGroupContainer">
+    <!-- Existing rules and rule groups will be rendered here -->
+  </div>
+  <%= link_to "Add Rule", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRule" } %>
+  <%= link_to "Add Rule Group", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRuleGroup" } %>
+
+  <!-- Hidden template for new rules and rule groups -->
+  <div data-goal-form-target="template" style="display: none;">
+    <!-- Rule Template -->
+    <div class="nested-fields rule" data-rule>
+      <div class="form-group">
+        <%= form.hidden_field :type, value: "Rule", name: "goal[rule_groups_attributes][TEMPLATE_ID][rules_attributes][][type]" %>
+        <%= form.label :name, "Rule Name" %>
+        <%= form.text_field :name, class: "form-control", name: "goal[rule_groups_attributes][TEMPLATE_ID][rules_attributes][][name]" %>
+      </div>
+      <!-- Include person-based rule fields here -->
+      <%= render "rules/person_form", f: form %>
+      <div class="form-group">
+        <%= form.label :operator, "Operator" %>
+        <%= form.select :operator, options_for_select([["", ""], ["AND", "AND"], ["OR", "OR"], ["NOT", "NOT"]]), {}, class: "form-control", name: "goal[rule_groups_attributes][TEMPLATE_ID][rules_attributes][][operator]" %>
+      </div>
+      <%= link_to "Remove Rule", "#", class: "btn btn-danger", data: { action: "click->goal-form#removeField" } %>
+    </div>
+
+    <!-- Rule Group Template -->
+    <div class="nested-fields rule-group" data-rule-group>
+      <div class="form-group">
+        <%= form.label :name, "Group Name" %>
+        <%= form.text_field :name, class: "form-control", name: "goal[rule_groups_attributes][TEMPLATE_ID][rule_group_attributes][name]" %>
+      </div>
+      <div class="rules">
+        <!-- Nested rules and rule groups will go here -->
+      </div>
+      <%= link_to "Add Nested Rule Group", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRuleGroup" } %>
+      <%= link_to "Add Rule", "#", class: "btn btn-secondary", data: { action: "click->goal-form#addRule" } %>
+      <%= link_to "Remove Rule Group", "#", class: "btn btn-danger", data: { action: "click->goal-form#removeField" } %>
+    </div>
   </div>
 
   <div class="actions">
