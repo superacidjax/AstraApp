@@ -1,17 +1,30 @@
 <!-- app/views/goals/_goal_rule_group_fields.html.erb -->
-<div class="rule-group" data-rule-group>
+<div class="rule-group border p-3 mb-3" data-rule-group>
+  <!-- Hidden Field for State -->
   <%= f.hidden_field :state, value: state %>
-  <div class="form-group">
-    <%= f.label :name, "Group Name" %>
-    <%= f.text_field :name, class: "form-control" %>
-  </div>
 
-  <div class="rules">
+  <!-- Rule Group Attributes -->
+  <%= f.fields_for :rule_group do |rg_form| %>
+    <div class="form-group">
+      <%= rg_form.label :name, "Group Name" %>
+      <%= rg_form.text_field :name, class: "form-control" %>
+    </div>
+  <% end %>
+
+  <!-- Rules within the Group -->
+  <div class="rules mb-3">
     <%= f.fields_for :rules do |rule_form| %>
-      <%= render "rule_fields", f: rule_form %>
+      <%= render "rules/person_form", f: rule_form, traits: traits, state: state %>
     <% end %>
   </div>
 
-  <%= link_to "Add Nested Rule Group", "#", class: "btn btn-secondary", data: { action: "goal-form#addNestedRuleGroup" } %>
-  <%= link_to "Add Rule", "#", class: "btn btn-secondary", data: { action: "goal-form#addRule" } %>
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <%= link_to "Add Nested Rule Group", "#", class: "btn btn-secondary btn-sm mr-2",
+      data: { action: "click->goal-form#addNestedRuleGroup" } %>
+    <%= link_to "Add Rule", "#", class: "btn btn-secondary btn-sm",
+      data: { action: "click->goal-form#addRule" } %>
+    <%= link_to "Remove Rule Group", "#", class: "btn btn-danger btn-sm mt-2",
+      data: { action: "click->goal-form#removeField" } %>
+  </div>
 </div>

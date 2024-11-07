@@ -1,13 +1,19 @@
+# app/controllers/goals_controller.rb
 class GoalsController < ApplicationController
+  include GoalsHelper
+
   def new
     @goal = Goal.new
-    @goal.goal_rule_groups.build
-    @goal.goal_rules.build
+    @goal.goal_rules.build(rule: Rule.new, state: :initial)
+    @goal.goal_rule_groups.build(rule_group: RuleGroup.new, state: :initial)
+    @traits = Trait.all # Adjust scope as necessary
   end
 
   def create
     @goal = Goal.new(goal_params)
-    @goal.account = Account.last # Not implemented
+    @goal.account = Account.last # Adjust as needed
+
+    @traits = Trait.all
 
     if @goal.save
       GoalCreationService.new(@goal).call
@@ -38,18 +44,17 @@ class GoalsController < ApplicationController
   def goal_params
     params.require(:goal).permit(
       :name, :description, :data,
-      goal_rules_attributes: [
-        :id, :rule_id, :operator, :_destroy
-      ],
       goal_rule_groups_attributes: [
-        :id, :rule_group_id, :operator, :_destroy,
+        :id, :operator, :_destroy,
         rule_group_attributes: [
-          :name, :data,
-          rule_group_memberships_attributes: [
-            :id, :parent_group_id,
-            :child_group_id, :operator,
-            :_destroy
-          ]
+          :id, :name, :data, :_destroy
+        ],
+        rules_attributes: [
+          :id, :type, :name, :client_application_ids, :trait_id,
+          :trait_operator, :trait_value, :trait_from,
+          :trait_to, :trait_inclusive, :trait_value_datetime,
+          :trait_from_datetime, :trait_to_datetime, :trait_inclusive_datetime,
+          :_destroy
         ]
       ]
     ).tap do |whitelisted|
