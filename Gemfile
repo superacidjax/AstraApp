@@ -40,6 +40,7 @@ end
 group :test do
   gem "capybara"
   gem "fabrication"
+  gem "faker"
   gem "selenium-webdriver"
   gem "simplecov", require: false
   gem "webmock"
