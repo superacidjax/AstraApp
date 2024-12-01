@@ -14,10 +14,10 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   def validate_trait_rule(record)
     value_type = record.ruleable.value_type
-    operator = record.trait_operator
+    operator = record.operator
 
     unless valid_operator?(value_type, operator)
-      record.errors.add(:trait_operator, "Invalid #{value_type} operator '#{operator}'")
+      record.errors.add(:operator, "Invalid #{value_type} operator '#{operator}'")
     end
 
     send("validate_#{value_type}_trait", record)
@@ -29,7 +29,7 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   # Numeric trait validation
   def validate_numeric_trait(record)
-    if record.trait_operator == "Within range"
+    if record.operator == "Within range"
       validate_range(record, :numeric)
     else
       validate_presence_of_value(record, :numeric)
@@ -49,7 +49,7 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   # Datetime trait validation
   def validate_datetime_trait(record)
-    if record.trait_operator == "Within range"
+    if record.operator == "Within range"
       validate_range(record, :datetime)
     else
       validate_datetime_value(record)
@@ -58,13 +58,13 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   def validate_presence_of_value(record, value_type)
     value = case value_type
-    when :numeric then numeric_or_nil(record.trait_value)
-    else record.trait_value
+    when :numeric then numeric_or_nil(record.value)
+    else record.value
     end
 
     unless value.present?
-      record.errors.add(:trait_value,
-                        "#{value_type.capitalize} value must be present for #{record.trait_operator}")
+      record.errors.add(:value,
+                        "#{value_type.capitalize} value must be present for #{record.operator}")
     end
   end
 
@@ -76,9 +76,9 @@ class PersonRuleDataValidator < ActiveModel::Validator
   end
 
   def validate_boolean_value(record)
-    value = boolean_or_nil(record.trait_value)
+    value = boolean_or_nil(record.value)
     unless [ true, false ].include?(value)
-      record.errors.add(:trait_value, "Boolean value must be true or false")
+      record.errors.add(:value, "Boolean value must be true or false")
     end
   end
 
@@ -86,7 +86,7 @@ class PersonRuleDataValidator < ActiveModel::Validator
     from, to = cast_range_values(record, value_type)
 
     if from.nil? || to.nil?
-      record.errors.add(:trait_from,
+      record.errors.add(:from,
                         "'from' and 'to' must be #{value_type} for 'within range' operator")
     end
 
@@ -96,22 +96,22 @@ class PersonRuleDataValidator < ActiveModel::Validator
   def cast_range_values(record, value_type)
     case value_type
     when :numeric
-      [ numeric_or_nil(record.trait_from), numeric_or_nil(record.trait_to) ]
+      [ numeric_or_nil(record.from), numeric_or_nil(record.to) ]
     when :datetime
-      [ valid_iso8601?(record.trait_from), valid_iso8601?(record.trait_to) ]
+      [ valid_iso8601?(record.from), valid_iso8601?(record.to) ]
     end
   end
 
   def validate_inclusive_key(record)
-    unless [ true, false ].include?(record.trait_inclusive)
-      record.errors.add(:trait_inclusive,
-                        "'trait_inclusive' key must be true or false for 'within range' operator")
+    unless [ true, false ].include?(record.inclusive)
+      record.errors.add(:inclusive,
+                        "'inclusive' key must be true or false for 'within range' operator")
     end
   end
 
   def validate_datetime_value(record)
-    unless valid_iso8601?(record.trait_value)
-      record.errors.add(:trait_value, "Value must be a valid ISO8601 datetime string")
+    unless valid_iso8601?(record.value)
+      record.errors.add(:value, "Value must be a valid ISO8601 datetime string")
     end
   end
 
