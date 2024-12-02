@@ -3,7 +3,7 @@ require "test_helper"
 class FlowGoalTest < ActiveSupport::TestCase
   setup do
     @flow = Fabricate(:flow)
-    @goal = Fabricate(:goal, data: valid_goal_data)
+    @goal = Fabricate(:goal_with_rules)
     @flow_goal = Fabricate(:flow_goal, flow: @flow, goal: @goal)
   end
 
@@ -31,46 +31,5 @@ class FlowGoalTest < ActiveSupport::TestCase
     flow_goal = Fabricate.build(:flow_goal, flow: @flow, goal: @goal, success_rate: "not_a_number")
     assert flow_goal.invalid?, "Flow goal with non-numeric success_rate should be invalid"
     assert flow_goal.errors[:success_rate].any?, "There should be an error for the non-numeric success_rate"
-  end
-
-  private
-
-  def valid_goal_data
-    {
-      "initial_state" => {
-        "items" => [
-          {
-            "type" => "rule_group",
-            "operator" => "OR",
-            "items" => [
-              {
-                "type" => "rule",
-                "rule_id" => Fabricate(:trait_rule).id,
-                "operator" => "AND"
-              },
-              {
-                "type" => "rule",
-                "rule_id" => Fabricate(:property_rule).id,
-                "operator" => nil
-              }
-            ]
-          },
-          {
-            "type" => "rule",
-            "rule_id" => Fabricate(:property_rule).id,
-            "operator" => nil
-          }
-        ]
-      },
-      "end_state" => {
-        "items" => [
-          {
-            "type" => "rule",
-            "rule_id" => Fabricate(:trait_rule).id,
-            "operator" => nil
-          }
-        ]
-      }
-    }.to_json
   end
 end

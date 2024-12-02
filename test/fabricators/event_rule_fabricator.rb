@@ -1,14 +1,17 @@
 Fabricator(:event_rule, from: :rule) do
+  account
   name { Faker::Company.bs }
   type { "EventRule" }
   ruleable { Fabricate(:property) }
 end
 
 Fabricator(:numeric_event_rule, from: :rule) do
-  account { Fabricate(:account) }
+  account
   name { Faker::Company.bs }
   type { "EventRule" }
-  ruleable { Fabricate(:numeric_property, event: event) }
+  operator "Greater than"
+  value "50"
+  ruleable { Fabricate(:numeric_property, event: Fabricate(:event)) }
 end
 
 Fabricator(:text_event_rule, from: :rule) do
