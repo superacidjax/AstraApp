@@ -1,0 +1,35 @@
+<% @form.fields_for :rule do |rule_form| %>
+  <div data-controller="event-rule-builder" data-event-rule-builder-target="eventRuleFields" style="display:none;">
+    <!-- Hidden input to store the selected rule type -->
+    <input type="hidden" name="<%= rule_form.object_name %>[type]" class="rule-type-field" value="EventRule" />
+
+    <div class="field">
+      <label>Occurrence Operator</label>
+      <select name="<%= rule_form.object_name %>[occurrence_operator]" class="form-select">
+        <option value="">Select occurrence operator</option>
+        <option value="Has occurred">Has Occurred</option>
+        <option value="Has not occurred">Has Not Occurred</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Event</label>
+      <select data-event-rule-builder-target="eventSelector" class="form-select">
+        <option value="">Select an event</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Property (optional)</label>
+      <select data-event-rule-builder-target="propertySelector" class="form-select">
+        <option value="">No Properties</option>
+      </select>
+    </div>
+
+    <!-- Additional Event rule fields go here -->
+
+    <div class="actions">
+      <button type="button" class="btn btn-secondary" data-action="click->rule-builder#addRule">Add Rule</button>
+    </div>
+  </div>
+<% end %>

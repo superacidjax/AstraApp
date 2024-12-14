@@ -1,0 +1,41 @@
+<div class="rule-builder" data-controller="rule-builder">
+  <%= @form.hidden_field :state %>
+
+  <div class="field">
+    <%= @form.fields_for :rule do |rule_form| %>
+      <%= rule_form.hidden_field :type, class: "rule-type-field" %>
+
+      <!-- ClientApplication selection -->
+      <div class="field">
+        <%= rule_form.label :client_application_id, "Client Application(s)" %><br>
+        <!-- "All Applications" option at the top -->
+        <select name="client_application_ids[]" multiple="multiple"
+          data-rule-builder-target="clientApplications" 
+          class="form-select">
+          <option value="all">All Applications</option>
+          <% @current_account.client_applications.each do |ca| %>
+            <option value="<%= ca.id %>"><%= ca.name %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <!-- Tabs: People / Events -->
+      <ul class="nav nav-tabs" id="ruleTypeTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-action="click->rule-builder#selectRuleType" data-rule-type-value="person_rule" href="#people-rule-tab" role="tab">People</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-action="click->rule-builder#selectRuleType" data-rule-type-value="event_rule" href="#event-rule-tab" role="tab">Events</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="people-rule-tab" role="tabpanel">
+          <%= render(PersonRuleFieldsComponent.new(form: rule_form)) %>
+        </div>
+        <div class="tab-pane fade" id="event-rule-tab" role="tabpanel">
+          <%= render(EventRuleFieldsComponent.new(form: rule_form)) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

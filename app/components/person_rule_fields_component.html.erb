@@ -1,0 +1,74 @@
+<div data-controller="people-rule-builder" data-people-rule-builder-target="ruleFields" style="display:none;">
+  <!-- Hidden input to store the selected rule type -->
+  <input type="hidden" name="<%= @form.object_name %>[type]" class="rule-type-field" value="PersonRule" />
+
+  <!-- Trait dropdown, operator, and value fields will be dynamically generated -->
+  <div class="field">
+    <label>Trait</label>
+    <select data-people-rule-builder-target="traitSelector" class="form-select">
+      <option value="">Select a trait</option>
+      <!-- Filled dynamically by Stimulus controller based on chosen Client Applications -->
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Operator</label>
+    <select data-people-rule-builder-target="operatorSelector" class="form-select">
+      <option value="">Select an operator</option>
+    </select>
+  </div>
+
+  <!-- Dynamic input groups -->
+  <div data-people-rule-builder-target="textInputGroup" style="display:none;">
+    <label>Value</label>
+    <input type="text" name="<%= @form.object_name %>[value]" class="form-control" />
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[case_sensitive]" value="true" />
+      <label class="form-check-label">Case sensitive</label>
+    </div>
+  </div>
+
+  <div data-people-rule-builder-target="numericInputGroup" style="display:none;">
+    <label>Value</label>
+    <input type="number" name="<%= @form.object_name %>[value]" class="form-control" />
+  </div>
+
+  <div data-people-rule-builder-target="numericRangeGroup" style="display:none;">
+    <label>From</label>
+    <input type="number" name="<%= @form.object_name %>[from]" class="form-control" />
+    <label>To</label>
+    <input type="number" name="<%= @form.object_name %>[to]" class="form-control" />
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[inclusive]" value="true" />
+      <label class="form-check-label">Values inclusive</label>
+    </div>
+  </div>
+
+  <div data-people-rule-builder-target="booleanInputGroup" style="display:none;">
+    <label>Value</label>
+    <select name="<%= @form.object_name %>[value]" class="form-select">
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+
+  <div data-people-rule-builder-target="datetimeInputGroup" style="display:none;">
+    <label>Value</label>
+    <input type="datetime-local" name="<%= @form.object_name %>[value]" class="form-control" />
+  </div>
+
+  <div data-people-rule-builder-target="datetimeRangeGroup" style="display:none;">
+    <label>From</label>
+    <input type="datetime-local" name="<%= @form.object_name %>[from]" class="form-control" />
+    <label>To</label>
+    <input type="datetime-local" name="<%= @form.object_name %>[to]" class="form-control" />
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[inclusive]" value="true" />
+      <label class="form-check-label">Values inclusive</label>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn btn-secondary" data-action="click->rule-builder#addRule">Add Rule</button>
+  </div>
+</div>

@@ -1,8 +1,11 @@
 <h1><%= @goal.name %></h1>
+<p><%= @goal.description %></p>
+<p>Success Rate: <%= @goal.success_rate %></p>
 
-<p>
-  <strong>Description:</strong>
-  <%= @goal.description %>
-</p>
+<h2>Initial State Rule</h2>
+<% initial_rule = @goal.goal_rules.find_by(state: :initial)&.rule %>
+<%= initial_rule ? initial_rule.name : "No Initial Rule set" %>
 
-<%= link_to "Back to Goals", goals_path, class: "btn btn-secondary" %>
+<h2>End State Rule</h2>
+<% end_rule = @goal.goal_rules.find_by(state: :end)&.rule %>
+<%= end_rule ? end_rule.name : "No End Rule set" %>

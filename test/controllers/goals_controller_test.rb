@@ -1,140 +1,103 @@
 require "test_helper"
 
 class GoalsControllerTest < ActionDispatch::IntegrationTest
-  # setup do
-  #   @account = Fabricate(:account)  # Ensure an account is set up for the goal
-  # end
-  #
-  # test "should get new goal form" do
-  #   get new_goal_url
-  #   assert_response :success
-  #   assert_select "form"  # Ensures the form is rendered
-  # end
-  #
-  # test "should create goal with name, description, and valid data" do
-  #   assert_difference("Goal.count", 1) do
-  #     post goals_url, params: {
-  #       goal: {
-  #         name: "Pre-Diabetic Engagement",
-  #         description: "This goal is to help identify pre-diabetic people.",
-  #         account_id: @account.id,  # Include the account
-  #         data: valid_goal_data  # Ensure data is passed and valid
-  #       }
-  #     }
-  #   end
-  #
-  #   goal = Goal.last
-  #   assert_redirected_to goal_url(goal)
-  #   follow_redirect!
-  #   assert_select "h1", text: /Pre-Diabetic Engagement/  # Confirms the goal name is displayed
-  #   assert_select "p", text: /identify pre-diabetic people/  # Confirms the description is displayed
-  # end
-  #
-  # test "should show goal" do
-  #   goal = Goal.create!(
-  #     name: "Pre-Diabetic Engagement",
-  #     description: "This goal is to help identify pre-diabetic people.",
-  #     account: @account,  # Ensure an account is associated
-  #     data: valid_goal_data
-  #   )
-  #
-  #   get goal_url(goal)
-  #   assert_response :success
-  #   assert_select "h1", text: /Pre-Diabetic Engagement/  # Verifies the goal name
-  #   assert_select "p", text: /identify pre-diabetic people/  # Verifies the description
-  # end
-  #
-  # test "should get index" do
-  #   Goal.create!(
-  #     name: "Pre-Diabetic Engagement",
-  #     description: "This goal is to help identify pre-diabetic people.",
-  #     account: @account,  # Ensure an account is associated
-  #     data: valid_goal_data
-  #   )
-  #   Goal.create!(
-  #     name: "Diabetes Risk Engagement",
-  #     description: "This goal is to engage with people at risk for diabetes.",
-  #     account: @account,
-  #     data: valid_goal_data
-  #   )
-  #
-  #   get goals_url
-  #   assert_response :success
-  #   assert_select "td", text: /Pre-Diabetic Engagement/  # Verifies the first goal in the list
-  #   assert_select "td", text: /Diabetes Risk Engagement/  # Verifies the second goal in the list
-  # end
-  #
-  # ### Errors
-  #
-  # test "should re-render new with unprocessable_entity status when goal creation fails (HTML)" do
-  #   assert_no_difference("Goal.count") do
-  #     post goals_url, params: {
-  #       goal: {
-  #         name: "",  # Invalid: missing name
-  #         description: "This goal is to help identify pre-diabetic people.",
-  #         account_id: @account.id,
-  #         data: valid_goal_data  # Valid data but missing the name
-  #       }
-  #     }
-  #   end
-  #
-  #   assert_response :unprocessable_entity
-  #   assert_select "form"  # Verifies that the form is re-rendered
-  #   assert_select "div#error_explanation", text: /Name can't be blank/  # Verifies error message is displayed
-  # end
-  #
-  # test "should re-render new with unprocessable_entity status when goal creation fails (Turbo Stream)" do
-  #   assert_no_difference("Goal.count") do
-  #     post goals_url, params: {
-  #       goal: {
-  #         name: "",  # Invalid: missing name
-  #         description: "This goal is to help identify pre-diabetic people.",
-  #         account_id: @account.id,
-  #         data: valid_goal_data  # Valid data but missing the name
-  #       },
-  #       format: :turbo_stream  # Simulates a Turbo Stream request
-  #     }
-  #   end
-  #
-  #   assert_response :unprocessable_entity
-  #   assert_match(/turbo-stream/, @response.content_type)  # Verifies response is Turbo Stream
-  #   assert_select "form"  # Verifies that the form is re-rendered
-  #   assert_select "div#error_explanation", text: /Name can't be blank/  # Verifies error message is displayed
-  # end
-  #
-  # private
-  #
-  # def valid_goal_data
-  #   {
-  #     "initial_state" => {
-  #       "items" => [
-  #         {
-  #           "type" => "rule_group",
-  #           "operator" => nil,
-  #           "items" => [
-  #             {
-  #               "type" => "rule",
-  #               "rule_id" => "1",  # Use a placeholder for the test
-  #               "operator" => "AND"  # Operator between the rules
-  #             },
-  #             {
-  #               "type" => "rule",
-  #               "rule_id" => "2",  # No operator on the last item in the group
-  #               "operator" => nil
-  #             }
-  #           ]
-  #         }
-  #       ]
-  #     },
-  #     "end_state" => {
-  #       "items" => [
-  #         {
-  #           "type" => "rule",
-  #           "rule_id" => "3",
-  #           "operator" => nil  # No operator for the last rule
-  #         }
-  #       ]
-  #     }
-  #   }.to_json
-  # end
+  setup do
+    @account = Fabricate(:account)
+    @user = Fabricate(:user)
+    Fabricate(:account_user, account: @account, user: @user)
+
+    @trait = Fabricate(:trait, account: @account, value_type: :numeric)
+    @client_app = Fabricate(:client_application, account: @account)
+    @event = Fabricate(:event, client_application: @client_app)
+    @property = Fabricate(:property, event: @event, value_type: :numeric)
+
+    @goal = Fabricate(:goal_with_rules, account: @account)
+  end
+
+  test "should get index" do
+    get goals_url
+    assert_response :success
+  end
+
+  test "should show goal" do
+    get goal_url(@goal)
+    assert_response :success
+    assert_select "h1", text: @goal.name
+  end
+
+  test "should get new" do
+    get new_goal_url
+    assert_response :success
+  end
+
+  test "should create a goal with rules" do
+    post goals_url, params: {
+      goal: {
+        name: "Test Goal",
+        description: "A test goal",
+        success_rate: "50.0",
+        goal_rules_attributes: {
+          "0" => {
+            state: "initial",
+            rule_attributes: {
+              type: "EventRule",
+              name: "Initial Rule",
+              operator: "Greater than",
+              value: "100",
+              ruleable_type: "Property",
+              ruleable_id: @property.id
+            }
+          },
+          "1" => {
+            state: "end",
+            rule_attributes: {
+              type: "PersonRule",
+              name: "End Rule",
+              operator: "Less than",
+              value: "28",
+              ruleable_type: "Trait",
+              ruleable_id: @trait.id
+            }
+          }
+        }
+      }
+    }
+
+    assert_redirected_to goal_path(Goal.last)
+    created_goal = Goal.last
+    assert_equal "Test Goal", created_goal.name
+    assert_equal 2, created_goal.goal_rules.size
+
+    initial_rule = created_goal.goal_rules.find_by(state: :initial).rule
+    assert_equal "EventRule", initial_rule.type
+    assert_equal @property.id, initial_rule.ruleable_id
+
+    end_rule = created_goal.goal_rules.find_by(state: :end).rule
+    assert_equal "PersonRule", end_rule.type
+    assert_equal @trait.id, end_rule.ruleable_id
+  end
+
+  test "should get edit" do
+    get edit_goal_url(@goal)
+    assert_response :success
+  end
+
+  test "should update goal" do
+    patch goal_url(@goal), params: {
+      goal: {
+        name: "Updated Goal Name"
+      }
+    }
+
+    assert_redirected_to goal_url(@goal)
+    @goal.reload
+    assert_equal "Updated Goal Name", @goal.name
+  end
+
+  test "should destroy goal" do
+    assert_difference("Goal.count", -1) do
+      delete goal_url(@goal)
+    end
+    assert_redirected_to goals_url
+  end
 end
