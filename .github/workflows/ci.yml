@@ -93,7 +93,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
         with:
-          coverageCommand: coverageCommand: bin/rails db:prepare test test:system
+          coverageCommand: bin/rails db:prepare test test:system
           coverageLocations: ${{ github.workspace }}/coverage/coverage.json:simplecov
           debug: true
       
