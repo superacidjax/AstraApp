@@ -1,42 +1,53 @@
-<%= form_with(model: @goal, url: @url, method: @method, local: true, data: { controller: "goal-form" }) do |form| %>
-  <div class="field">
-    <%= form.label :name, "Name", class: "label" %>
-    <div class="control">
-      <%= form.text_field :name, class: "input" %>
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <%= form_with(model: @goal, url: @url, method: @method, local: true, data: { controller: "goal-form" }) do |form| %>
+          <div class="field">
+            <%= form.label :name, "Name", class: "label" %>
+            <div class="control">
+              <%= form.text_field :name, class: "input" %>
+            </div>
+          </div>
+
+          <div class="field">
+            <%= form.label :description, "Description", class: "label" %>
+            <div class="control">
+              <%= form.text_area :description, class: "textarea" %>
+            </div>
+          </div>
+
+          <div class="columns is-variable is-8">
+            <div class="column" data-test-id="initial-state-section">
+              <h2 class="title is-4">Initial State</h2>
+              <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "initial" } do |gr_form| %>
+                <%= render RuleBuilderComponent.new(
+                  form: gr_form,
+                  current_account: @current_account,
+                  traits: @traits
+                ) %>
+              <% end %>
+            </div>
+
+            <div class="column" data-test-id="end-state-section">
+              <h2 class="title is-4">End State</h2>
+              <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "end" } do |gr_form| %>
+                <%= render RuleBuilderComponent.new(
+                  form: gr_form,
+                  current_account: @current_account,
+                  traits: @traits
+                ) %>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="field is-grouped mt-5">
+            <div class="control">
+              <%= form.submit "Save Goal", class: "button is-primary" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
-
-  <div class="field">
-    <%= form.label :description, "Description", class: "label" %>
-    <div class="control">
-      <%= form.text_area :description, class: "textarea" %>
-    </div>
-  </div>
-
-  <div data-test-id="initial-state-section">
-    <h2 class="title is-4">Initial State</h2>
-    <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "initial" } do |gr_form| %>
-      <%= render RuleBuilderComponent.new(
-        form: gr_form,
-        current_account: @current_account,
-        traits: @traits,
-      ) %>
-  <% end %>
-  </div>
-  <div data-test-id="end-state-section">
-    <h2 class="title is-4 mt-5">End State</h2>
-    <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "end" } do |gr_form| %>
-      <%= render RuleBuilderComponent.new(
-        form: gr_form,
-        current_account: @current_account,
-        traits: @traits,
-      ) %>
-  <% end %>
-  </div>
-
-  <div class="field is-grouped mt-5">
-    <div class="control">
-      <%= form.submit "Save Goal", class: "button is-primary" %>
-    </div>
-  </div>
-<% end %>
+</div>

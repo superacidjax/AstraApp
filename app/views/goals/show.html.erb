@@ -1,11 +1,67 @@
-<h1><%= @goal.name %></h1>
-<p><%= @goal.description %></p>
-<p>Success Rate: <%= @goal.success_rate %></p>
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <h1 class="title"><%= @goal.name %></h1>
+        <p class="subtitle"><%= @goal.description %></p>
+        <p><strong>Success Rate:</strong> <%= @goal.success_rate %></p>
 
-<h2>Initial State Rule</h2>
-<% initial_rule = @goal.goal_rules.find_by(state: :initial)&.rule %>
-<%= initial_rule ? initial_rule.name : "No Initial Rule set" %>
+        <% initial_rule = @goal.goal_rules.find_by(state: :initial)&.rule %>
+        <% end_rule = @goal.goal_rules.find_by(state: :end)&.rule %>
 
-<h2>End State Rule</h2>
-<% end_rule = @goal.goal_rules.find_by(state: :end)&.rule %>
-<%= end_rule ? end_rule.name : "No End Rule set" %>
+        <div class="columns mt-5">
+          <div class="column">
+            <h2 class="title is-4">Initial State Rule</h2>
+            <% if initial_rule %>
+              <div class="box">
+                <p><strong>Name:</strong> <%= initial_rule.name %></p>
+                <p><strong>Trait:</strong> <%= initial_rule.ruleable&.name || "N/A" %></p>
+                <p><strong>Operator:</strong> <%= initial_rule.operator %></p>
+
+                <% if initial_rule.operator == "within_range" %>
+                  <p><strong>From:</strong> <%= initial_rule.from %></p>
+                  <p><strong>To:</strong> <%= initial_rule.to %></p>
+                  <p><strong>Inclusive:</strong> <%= initial_rule.inclusive ? "Yes" : "No" %></p>
+                <% else %>
+                  <p><strong>Value:</strong> <%= initial_rule.value.presence || "N/A" %></p>
+                <% end %>
+              </div>
+            <% else %>
+              <p>No Initial Rule set</p>
+            <% end %>
+          </div>
+
+          <div class="column">
+            <h2 class="title is-4">End State Rule</h2>
+            <% if end_rule %>
+              <div class="box">
+                <p><strong>Name:</strong> <%= end_rule.name %></p>
+                <p><strong>Trait:</strong> <%= end_rule.ruleable&.name || "N/A" %></p>
+                <p><strong>Operator:</strong> <%= end_rule.operator %></p>
+
+                <% if end_rule.operator == "within_range" %>
+                  <p><strong>From:</strong> <%= end_rule.from %></p>
+                  <p><strong>To:</strong> <%= end_rule.to %></p>
+                  <p><strong>Inclusive:</strong> <%= end_rule.inclusive ? "Yes" : "No" %></p>
+                <% else %>
+                  <p><strong>Value:</strong> <%= end_rule.value.presence || "N/A" %></p>
+                <% end %>
+              </div>
+            <% else %>
+              <p>No End Rule set</p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="field is-grouped mt-5">
+          <div class="control">
+            <%= link_to "Edit", edit_goal_path(@goal), class: "button is-primary" %>
+          </div>
+          <div class="control">
+            <%= link_to "Back to Goals", goals_path, class: "button" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
