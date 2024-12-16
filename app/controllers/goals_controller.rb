@@ -7,73 +7,38 @@ class GoalsController < ApplicationController
                             .order(created_at: :desc)
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @goal = current_account.goals.new
     load_form_data
-
-    initial_rule = @goal.goal_rules.build(state: :initial)
-    initial_rule.build_rule(type: "PersonRule")
-
-    end_rule = @goal.goal_rules.build(state: :end)
-    end_rule.build_rule(type: "PersonRule")
-
-    render GoalFormComponent.new(
-      goal: @goal,
-      url: goals_path,
-      method: :post,
-      current_account: current_account,
-      traits: @traits
-    )
+    build_default_goal_rules(@goal)
+    render_goal_form(url: goals_path, method: :post)
   end
 
   def create
     @goal = current_account.goals.new(goal_params)
-    @goal.goal_rules.each do |gr|
-      gr.rule.account = current_account if gr.rule
-    end
+    assign_account_to_rules(@goal)
     if @goal.save
       redirect_to @goal, notice: "Goal was successfully created."
     else
-      load_form_data
-      flash.now[:alert] = "There were errors creating the goal."
-      render GoalFormComponent.new(
-        goal: @goal,
-        url: goals_path,
-        method: :post,
-        current_account: current_account,
-        traits: @traits
-      ), status: :unprocessable_entity
+      handle_form_failure("There were errors creating the goal.",
+                          url: goals_path, method: :post)
     end
   end
 
   def edit
     ensure_goal_rules
     load_form_data
-    render GoalFormComponent.new(
-      goal: @goal,
-      url: goal_path(@goal),
-      method: :patch,
-      current_account: current_account,
-      traits: @traits
-    )
+    render_goal_form(url: goal_path(@goal), method: :patch)
   end
 
   def update
     if @goal.update(goal_params)
       redirect_to @goal, notice: "Goal was successfully updated."
     else
-      load_form_data
-      flash.now[:alert] = "There were errors updating the goal."
-      render GoalFormComponent.new(
-        goal: @goal,
-        url: goal_path(@goal),
-        method: :patch,
-        current_account: current_account,
-        traits: @traits
-      ), status: :unprocessable_entity
+      handle_form_failure("There were errors updating the goal.",
+                          url: goal_path(@goal), method: :patch)
     end
   end
 
@@ -89,14 +54,24 @@ class GoalsController < ApplicationController
   end
 
   def ensure_goal_rules
-    if @goal.goal_rules.initial.count.zero?
-      gr = @goal.goal_rules.build(state: :initial)
-      gr.build_rule(type: "PersonRule")
-    end
+    build_default_goal_rules(@goal)
+  end
 
-    if @goal.goal_rules.end.count.zero?
-      gr = @goal.goal_rules.build(state: :end)
-      gr.build_rule(type: "EventRule")
+  def build_default_goal_rules(goal)
+    build_rule_if_none(goal, :initial, "PersonRule")
+    build_rule_if_none(goal, :end, "PersonRule")
+  end
+
+  def build_rule_if_none(goal, state, rule_type)
+    return unless goal.goal_rules.where(state: state).count.zero?
+
+    gr = goal.goal_rules.build(state: state)
+    gr.build_rule(type: rule_type)
+  end
+
+  def assign_account_to_rules(goal)
+    goal.goal_rules.each do |gr|
+      gr.rule.account = current_account if gr.rule
     end
   end
 
@@ -136,12 +111,23 @@ class GoalsController < ApplicationController
   end
 
   def load_form_data
-    @traits = get_traits.map do |t|
-      {
-        id: t.id,
-        name: t.name,
-        value_type: t.value_type
-      }
-    end
+    @traits = get_traits.map { |t| { id: t.id, name: t.name,
+                                     value_type: t.value_type } }
+  end
+
+  def render_goal_form(url:, method:, status: nil)
+    render GoalFormComponent.new(
+      goal: @goal,
+      url: url,
+      method: method,
+      current_account: current_account,
+      traits: @traits
+    ), status: status
+  end
+
+  def handle_form_failure(message, url:, method:)
+    load_form_data
+    flash.now[:alert] = message
+    render_goal_form(url: url, method: method, status: :unprocessable_entity)
   end
 end
