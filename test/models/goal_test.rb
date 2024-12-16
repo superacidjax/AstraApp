@@ -1,7 +1,6 @@
 require "test_helper"
 
 class GoalTest < ActiveSupport::TestCase
-
   test "fixture goal should be valid" do
     goal = Fabricate.build(:goal_with_rules)
     assert goal.valid?, "Fixture goal is not valid"

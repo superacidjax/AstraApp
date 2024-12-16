@@ -1,6 +1,6 @@
 Fabricator(:property) do
   event
-  name { ['date_of_lab', 'test_type', 'result', 'source'].sample }
+  name { [ "date_of_lab", "test_type", "result", "source" ].sample }
 end
 
 Fabricator(:numeric_property, from: :property) do

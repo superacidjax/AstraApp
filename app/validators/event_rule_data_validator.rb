@@ -1,10 +1,10 @@
 class EventRuleDataValidator < ActiveModel::Validator
   ALLOWED_OPERATORS = {
-    "numeric"   => ["Greater than", "Less than", "Equal to", "Within range"],
-    "text"      => ["Equals", "Not equals", "Contains", "Does not contain"],
-    "boolean"   => ["Is", "Is not"],
-    "datetime"  => ["Before", "After", "Within range"],
-    "occurrence"=> ["Has occurred", "Has not occurred"]
+    "numeric"   => [ "Greater than", "Less than", "Equal to", "Within range" ],
+    "text"      => [ "Equals", "Not equals", "Contains", "Does not contain" ],
+    "boolean"   => [ "Is", "Is not" ],
+    "datetime"  => [ "Before", "After", "Within range" ],
+    "occurrence"=> [ "Has occurred", "Has not occurred" ]
   }.freeze
 
   def validate(record)
@@ -107,14 +107,14 @@ class EventRuleDataValidator < ActiveModel::Validator
 
   def validate_case_sensitivity(record)
     if record.data.key?("case_sensitive") &&
-        ![true, false].include?(record.data["case_sensitive"])
+        ![ true, false ].include?(record.data["case_sensitive"])
       record.errors.add("case_sensitive", "case_sensitive must be true or false")
     end
   end
 
   def validate_boolean_value(record, key)
     value = convert_to_boolean(record.send(key))
-    unless [true, false].include?(value)
+    unless [ true, false ].include?(value)
       record.errors.add(key, "Boolean value must be true or false")
     end
   end
@@ -128,7 +128,7 @@ class EventRuleDataValidator < ActiveModel::Validator
 
   def validate_inclusive_key(record, key)
     inclusive = record.send(key)
-    unless [true, false].include?(inclusive)
+    unless [ true, false ].include?(inclusive)
       record.errors.add(key, "'inclusive' key must be true or false")
     end
   end
@@ -158,7 +158,7 @@ class EventRuleDataValidator < ActiveModel::Validator
       record.errors.add(:datetime_to, "'datetime_to' must be present for implied 'within range'")
     end
 
-    unless [true, false].include?(record.occurrence_inclusive)
+    unless [ true, false ].include?(record.occurrence_inclusive)
       record.errors.add(:occurrence_inclusive, "'occurrence_inclusive' must be true or false")
     end
   end
