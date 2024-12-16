@@ -65,9 +65,7 @@
     <div class="control">
       <%= form.text_field :value, class: "input", id: "value_text_#{state}" %>
     </div>
-    <div class="field"
-      data-people-rule-builder-target="caseSensitiveGroup"
-      style="display: none;">
+    <div class="field">
       <label class="checkbox" for="case_sensitive_<%= state %>">
         <%= form.check_box :case_sensitive, id: "case_sensitive_#{state}" %> Case sensitive
       </label>

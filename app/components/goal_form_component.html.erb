@@ -13,23 +13,26 @@
     </div>
   </div>
 
-  <h2 class="title is-4">Initial State</h2>
-  <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "initial" } do |gr_form| %>
-    <%= render RuleBuilderComponent.new(
-      form: gr_form,
-      current_account: @current_account,
-      traits: @traits,
-    ) %>
+  <div data-test-id="initial-state-section">
+    <h2 class="title is-4">Initial State</h2>
+    <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "initial" } do |gr_form| %>
+      <%= render RuleBuilderComponent.new(
+        form: gr_form,
+        current_account: @current_account,
+        traits: @traits,
+      ) %>
   <% end %>
-
-  <h2 class="title is-4 mt-5">End State</h2>
-  <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "end" } do |gr_form| %>
-    <%= render RuleBuilderComponent.new(
-      form: gr_form,
-      current_account: @current_account,
-      traits: @traits,
-    ) %>
+  </div>
+  <div data-test-id="end-state-section">
+    <h2 class="title is-4 mt-5">End State</h2>
+    <%= form.fields_for :goal_rules, @goal.goal_rules.select { |gr| gr.state == "end" } do |gr_form| %>
+      <%= render RuleBuilderComponent.new(
+        form: gr_form,
+        current_account: @current_account,
+        traits: @traits,
+      ) %>
   <% end %>
+  </div>
 
   <div class="field is-grouped mt-5">
     <div class="control">

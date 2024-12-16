@@ -9,20 +9,20 @@ Fabricator(:person_rule, from: :rule) do
     allowed_operators =
       case value_type
       when "numeric"
-        [ "Greater than", "Less than", "Equal to", "Within range" ]
+        [ "greater_than", "less_than", "equal_to", "within_range" ]
       when "text"
-        [ "Equals", "Not equals", "Contains", "Does not contain" ]
+        [ "equals", "not_equals", "contains", "does_not_contain" ]
       when "boolean"
-        [ "Is", "Is not" ]
+        [ "is", "is_not" ]
       when "datetime"
-        [ "Before", "After", "Within range" ]
+        [ "before", "after", "within_range" ]
       else
         []
       end
 
     person_rule.operator = allowed_operators.sample
 
-    if person_rule.operator == "Within range"
+    if person_rule.operator == "within_range"
       person_rule.from = Faker::Number.between(from: 10, to: 50).to_s
       person_rule.to = Faker::Number.between(from: 51, to: 100).to_s
       person_rule.inclusive = Faker::Boolean.boolean

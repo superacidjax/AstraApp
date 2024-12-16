@@ -7,7 +7,8 @@ class GoalsController < ApplicationController
                             .order(created_at: :desc)
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @goal = current_account.goals.new

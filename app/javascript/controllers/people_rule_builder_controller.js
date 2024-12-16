@@ -11,47 +11,36 @@ export default class extends Controller {
     "booleanInputGroup",
     "datetimeInputGroup",
     "datetimeRangeGroup",
-    "ruleFields",
-    "personRuleFields",
-    "eventRuleFields"
+    "ruleFields"
   ]
 
   connect() {
     console.log("people rule builder connected")
 
-    // If traits are provided in data-people-rule-builder-traits-value,
-    // we can parse them here:
     const traitsValue = this.element.dataset.peopleRuleBuilderTraitsValue
-    if (traitsValue) {
-      this.allTraits = JSON.parse(traitsValue)
-    } else {
-      this.allTraits = []
+    this.allTraits = traitsValue ? JSON.parse(traitsValue) : []
+
+    // Attach a handler to the nearest form's submit event
+    const form = this.element.closest("form")
+    if (form) {
+      form.addEventListener("submit", () => this.cleanupFields())
     }
   }
 
-    updateOperator(event) {
+  updateOperator(event) {
     const selectedTraitId = event.target.value
-
-    // Find the trait based on the selected ID
     const selectedTrait = this.allTraits.find(
       (trait) => trait.id.toString() === selectedTraitId
     )
 
-    // Reset operator and dynamic inputs
     this.clearOperatorOptions()
     this.clearDynamicInputs()
 
-    // If no trait is found, exit early
-    if (!selectedTrait) {
-      return
-    }
+    if (!selectedTrait) return
 
-    // Store the selected value type for handleOperatorChange
     this.selectedValueType = selectedTrait.value_type
-
     let operators = []
 
-    // Determine operators based on value_type
     switch (this.selectedValueType) {
       case "text":
         operators = ["Equals", "Not equals", "Contains", "Does not contain"]
@@ -67,10 +56,8 @@ export default class extends Controller {
         break
       default:
         console.warn("Unknown value type:", this.selectedValueType)
-        this.clearDynamicInputs()
     }
 
-    // Populate operator dropdown
     operators.forEach((operator) => {
       const option = document.createElement("option")
       option.value = operator.toLowerCase().replace(/ /g, "_")
@@ -107,7 +94,6 @@ export default class extends Controller {
   handleOperatorChange(event) {
     const selectedOperator = event.target.value
 
-    // Ensure selectedValueType is set
     if (!this.selectedValueType) {
       const selectedTraitId = this.traitSelectorTarget.value
       const selectedTrait = this.allTraits.find(
@@ -153,5 +139,23 @@ export default class extends Controller {
     if (target) {
       target.style.display = "block"
     }
+  }
+
+  cleanupFields() {
+    const groups = [
+      this.textInputGroupTarget,
+      this.numericInputGroupTarget,
+      this.numericRangeGroupTarget,
+      this.booleanInputGroupTarget,
+      this.datetimeInputGroupTarget,
+      this.datetimeRangeGroupTarget
+    ]
+
+    groups.forEach((group) => {
+      if (group && group.style.display === "none") {
+        // Remove the entire group from the DOM
+        group.remove()
+      }
+    })
   }
 }

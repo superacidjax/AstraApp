@@ -1,9 +1,9 @@
 class PersonRuleDataValidator < ActiveModel::Validator
   ALLOWED_OPERATORS = {
-    "numeric" => [ "Greater than", "Less than", "Equal to", "Within range" ],
-    "text" => [ "Equals", "Not equals", "Contains", "Does not contain" ],
-    "boolean" => [ "Is", "Is not" ],
-    "datetime" => [ "Before", "After", "Within range" ]
+    "numeric" => [ "greater_than", "less_than", "equal_to", "within_range" ],
+    "text" => [ "equals", "not_equals", "contains", "does_not_contain" ],
+    "boolean" => [ "is", "is_not" ],
+    "datetime" => [ "before", "after", "within_range" ]
   }.freeze
 
   def validate(record)
@@ -29,7 +29,7 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   # Numeric trait validation
   def validate_numeric_trait(record)
-    if record.operator == "Within range"
+    if record.operator == "within_range"
       validate_range(record, :numeric)
     else
       validate_presence_of_value(record, :numeric)
@@ -49,7 +49,7 @@ class PersonRuleDataValidator < ActiveModel::Validator
 
   # Datetime trait validation
   def validate_datetime_trait(record)
-    if record.operator == "Within range"
+    if record.operator == "within_range"
       validate_range(record, :datetime)
     else
       validate_datetime_value(record)
