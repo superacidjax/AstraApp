@@ -25,7 +25,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with numeric operator 'Greater than'" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Greater than"
+    person_rule.operator = "greater_than"
     person_rule.value = "50"
     assert person_rule.valid?, "PersonRule with 'Greater than' operator should be valid"
   end
@@ -33,7 +33,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with numeric operator 'Less than'" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Less than"
+    person_rule.operator = "less_than"
     person_rule.value = "20"
     person_rule.from = nil
     person_rule.to = nil
@@ -44,7 +44,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with numeric operator 'Equal to'" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Equal to"
+    person_rule.operator = "equal_to"
     person_rule.value = "30"
     person_rule.from = nil
     person_rule.to = nil
@@ -55,7 +55,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with numeric operator 'Within range'" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Within range"
+    person_rule.operator = "within_range"
     person_rule.value = nil
     person_rule.from = "20"
     person_rule.to = "40"
@@ -66,7 +66,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with text operator 'Equals'" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Equals"
+    person_rule.operator = "equals"
     person_rule.value = "Example"
     person_rule.from = nil
     person_rule.to = nil
@@ -78,7 +78,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with text operator 'Not equals'" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Not equals"
+    person_rule.operator = "not_equals"
     person_rule.value = "Example"
     person_rule.from = nil
     person_rule.to = nil
@@ -90,7 +90,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with text operator 'Contains'" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Contains"
+    person_rule.operator = "contains"
     person_rule.value = "test"
     person_rule.from = nil
     person_rule.to = nil
@@ -101,7 +101,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with text operator 'Does not contain'" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Does not contain"
+    person_rule.operator = "does_not_contain"
     person_rule.value = "test"
     person_rule.from = nil
     person_rule.to = nil
@@ -112,7 +112,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with boolean operator 'Is'" do
     trait = fabricate_trait("boolean")
     person_rule.ruleable = trait
-    person_rule.operator = "Is"
+    person_rule.operator = "is"
     person_rule.value = "true"
     person_rule.from = nil
     person_rule.to = nil
@@ -123,7 +123,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with boolean operator 'Is not'" do
     trait = fabricate_trait("boolean")
     person_rule.ruleable = trait
-    person_rule.operator = "Is not"
+    person_rule.operator = "is_not"
     person_rule.value = "false"
     person_rule.from = nil
     person_rule.to = nil
@@ -134,7 +134,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with datetime operator 'Before'" do
     trait = fabricate_trait("datetime")
     person_rule.ruleable = trait
-    person_rule.operator = "Before"
+    person_rule.operator = "before"
     person_rule.value = "2024-12-01T12:00:00Z"
     person_rule.from = nil
     person_rule.to = nil
@@ -145,7 +145,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with datetime operator 'After'" do
     trait = fabricate_trait("datetime")
     person_rule.ruleable = trait
-    person_rule.operator = "After"
+    person_rule.operator = "after"
     person_rule.value = "2024-12-01T12:00:00Z"
     person_rule.from = nil
     person_rule.to = nil
@@ -156,7 +156,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be valid with datetime operator 'Within range'" do
     trait = fabricate_trait("datetime")
     person_rule.ruleable = trait
-    person_rule.operator = "Within range"
+    person_rule.operator = "within_range"
     person_rule.value = nil
     person_rule.from = "2024-01-01T00:00:00Z"
     person_rule.to = "2024-12-31T23:59:59Z"
@@ -167,25 +167,25 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be invalid with operator not allowed for value_type" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Contains"
+    person_rule.operator = "contains"
     person_rule.value = "test"
     assert_not person_rule.valid?, "PersonRule should be invalid with operator not allowed for value_type"
-    assert_includes person_rule.errors[:operator], "Invalid numeric operator 'Contains'"
+    assert_includes person_rule.errors[:operator], "Invalid numeric operator 'contains'"
   end
 
   test "should be invalid without value for non-range operator" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Equals"
+    person_rule.operator = "equals"
     person_rule.value = nil
     assert_not person_rule.valid?, "PersonRule should be invalid without value for non-range operator"
-    assert_includes person_rule.errors[:value], "Text value must be present for Equals"
+    assert_includes person_rule.errors[:value], "Text value must be present for equals"
   end
 
   test "should be invalid without from and to for 'Within range' operator" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Within range"
+    person_rule.operator = "within_range"
     person_rule.inclusive = true
     assert_not person_rule.valid?, "PersonRule should be invalid without from and to for 'Within range'"
     assert_includes person_rule.errors[:from],
@@ -195,7 +195,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be invalid if inclusive is not true or false for 'Within range' operator" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Within range"
+    person_rule.operator = "within_range"
     person_rule.from = "10"
     person_rule.to = "20"
     person_rule.inclusive = nil
@@ -207,7 +207,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be invalid if case_sensitive is not true or false for text trait" do
     trait = fabricate_trait("text")
     person_rule.ruleable = trait
-    person_rule.operator = "Equals"
+    person_rule.operator = "equals"
     person_rule.value = "Test"
     person_rule.data["case_sensitive"] = "maybe"
     assert_not person_rule.valid?, "PersonRule should be invalid if case_sensitive is not true or false"
@@ -218,7 +218,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be invalid with non-boolean value for boolean trait" do
     trait = fabricate_trait("boolean")
     person_rule.ruleable = trait
-    person_rule.operator = "Is"
+    person_rule.operator = "is"
     person_rule.value = "not a boolean"
     assert_not person_rule.valid?, "PersonRule should be invalid with non-boolean value for boolean trait"
     assert_includes person_rule.errors[:value], "Boolean value must be true or false"
@@ -227,7 +227,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should be invalid with non-ISO8601 value for datetime trait" do
     trait = fabricate_trait("datetime")
     person_rule.ruleable = trait
-    person_rule.operator = "After"
+    person_rule.operator = "after"
     person_rule.value = "invalid-date"
     assert_not person_rule.valid?, "PersonRule should be invalid with non-ISO8601 value for datetime trait"
     assert_includes person_rule.errors[:value],
@@ -237,7 +237,7 @@ class PersonRuleTest < ActiveSupport::TestCase
   test "should not include occurrence-related fields" do
     trait = fabricate_trait("numeric")
     person_rule.ruleable = trait
-    person_rule.operator = "Greater than"
+    person_rule.operator = "greater_than"
     person_rule.value = "50"
     assert person_rule.valid?, "PersonRule should be valid without occurrence-related fields"
     assert_nil person_rule.occurrence_operator, "occurrence_operator should be nil"
