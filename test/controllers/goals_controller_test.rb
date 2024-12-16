@@ -5,18 +5,17 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
     @account = Fabricate(:account)
     @user = Fabricate(:user)
     Fabricate(:account_user, account: @account, user: @user)
-
     @trait = Fabricate(:trait, account: @account, value_type: :numeric)
     @client_app = Fabricate(:client_application, account: @account)
     @event = Fabricate(:event, client_application: @client_app)
     @property = Fabricate(:property, event: @event, value_type: :numeric)
-
     @goal = Fabricate(:goal_with_rules, account: @account)
   end
 
   test "should get index" do
     get goals_url
     assert_response :success
+    assert_select "h1", text: "Goals"
   end
 
   test "should show goal" do
@@ -28,6 +27,16 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
     get new_goal_url
     assert_response :success
+
+    assert_select "form[action=?][method=?]", goals_path, "post" do
+      assert_select "input[name='goal[name]']"
+      assert_select "textarea[name='goal[description]']"
+
+      assert_select "h2", text: "Initial State"
+      assert_select "select[id^=traits_]"
+      assert_select "select[id^=operator_]"
+      assert_select "option", text: "Select an operator"
+    end
   end
 
   test "should create a goal with rules" do
@@ -77,9 +86,34 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @trait.id, end_rule.ruleable_id
   end
 
+  test "should fail to create goal if invalid" do
+    post goals_url, params: {
+      goal: {
+        description: "No name",
+        success_rate: "50.0"
+      }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select ".notification.is-danger", text: "There were errors creating the goal."
+    assert_select "form" do
+      assert_select "[action=?]", goals_path
+      assert_select "[method=?]", "post"
+    end
+  end
+
   test "should get edit" do
     get edit_goal_url(@goal)
     assert_response :success
+
+    assert_select "form[action=?][method=?]", goal_path(@goal), "post" do
+      assert_select "input[name='goal[name]'][value=?]", @goal.name
+      assert_select "textarea[name='goal[description]']", @goal.description
+
+      assert_select "h2", text: "End State"
+      assert_select "select[id^=traits_]"
+      assert_select "select[id^=operator_]"
+    end
   end
 
   test "should update goal" do

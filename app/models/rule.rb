@@ -16,6 +16,7 @@ class Rule < ApplicationRecord
     from: :string,           # For range-based rules
     to: :string,             # For range-based rules
     inclusive: :boolean,     # Inclusive/exclusive range
+    case_sensitive: :boolean,  # for text case sensitivity
 
     # Event Occurrence-related fields (specific to EventRule)
     occurrence_operator: :string,    # "Has occurred" or "Has not occurred"

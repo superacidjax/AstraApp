@@ -1,0 +1,98 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+@use "bulma";
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Update CSS variables */
+  }
+}
+
+[data-theme=dark],
+.theme-dark {
+  /* Update CSS variables */
+}
+
+
+// Homepage
+
+/* home.scss */
+
+.headline {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.tagline {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+.cta-buttons {
+  margin-top: 2rem;
+
+  .button.is-primary {
+    background-color: #FF6B35;
+    border-color: #FF6B35;
+    &:hover,
+    &:focus {
+      background-color: darken(#FF6B35, 5%);
+      border-color: darken(#FF6B35, 5%);
+    }
+  }
+
+  a.button {
+    margin: 0 0.5rem;
+  }
+}
+
+.features {
+  background: #3A9D9B;
+  color: white;
+
+  .title {
+    margin-bottom: 0.75rem;
+    color: white;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+}
+
+.about {
+  .about-text {
+    max-width: 700px;
+    margin: 1.5rem auto 0;
+    line-height: 1.6;
+  }
+}
+
+// Nav Bar
+
+.is-centered-navbar {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-center {
+  display: flex;
+  align-items: center;
+  gap: 2rem; /* Spacing between menu items */
+}

@@ -1,74 +1,158 @@
-<div data-controller="people-rule-builder" data-people-rule-builder-target="ruleFields" style="display:none;">
-  <!-- Hidden input to store the selected rule type -->
-  <input type="hidden" name="<%= @form.object_name %>[type]" class="rule-type-field" value="PersonRule" />
+<div
+  data-controller="people-rule-builder"
+  data-people-rule-builder-traits-value="<%= traits.to_json %>"
+  data-people-rule-builder-state-value="<%= state %>">
 
-  <!-- Trait dropdown, operator, and value fields will be dynamically generated -->
-  <div class="field">
-    <label>Trait</label>
-    <select data-people-rule-builder-target="traitSelector" class="form-select">
-      <option value="">Select a trait</option>
-      <!-- Filled dynamically by Stimulus controller based on chosen Client Applications -->
-    </select>
-  </div>
+  <%= form.hidden_field :type, value: "PersonRule", class: "rule-type-field" %>
 
   <div class="field">
-    <label>Operator</label>
-    <select data-people-rule-builder-target="operatorSelector" class="form-select">
-      <option value="">Select an operator</option>
-    </select>
-  </div>
-
-  <!-- Dynamic input groups -->
-  <div data-people-rule-builder-target="textInputGroup" style="display:none;">
-    <label>Value</label>
-    <input type="text" name="<%= @form.object_name %>[value]" class="form-control" />
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[case_sensitive]" value="true" />
-      <label class="form-check-label">Case sensitive</label>
+    <label class="label" for="rule_name_<%= state %>">Rule Name</label>
+    <div class="control">
+      <%= form.text_field :name, class: "input", id: "rule_name_#{state}" %>
     </div>
   </div>
 
-  <div data-people-rule-builder-target="numericInputGroup" style="display:none;">
-    <label>Value</label>
-    <input type="number" name="<%= @form.object_name %>[value]" class="form-control" />
-  </div>
-
-  <div data-people-rule-builder-target="numericRangeGroup" style="display:none;">
-    <label>From</label>
-    <input type="number" name="<%= @form.object_name %>[from]" class="form-control" />
-    <label>To</label>
-    <input type="number" name="<%= @form.object_name %>[to]" class="form-control" />
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[inclusive]" value="true" />
-      <label class="form-check-label">Values inclusive</label>
+  <div class="field">
+    <label class="label" for="traits_<%= state %>">Trait</label>
+    <div class="control">
+      <div class="select">
+        <%= form.select(
+          :ruleable_id,
+          options_for_select(@traits.map { |tr| [tr[:name], tr[:id]] }, selected: ""),
+          { include_blank: "Select a trait" },
+          {
+            class: "input",
+            id: "traits_#{state}",
+            data: {
+              action: "change->people-rule-builder#updateOperator",
+              "people-rule-builder-target": "traitSelector"
+            }
+          }
+        ) %>
+      </div>
     </div>
   </div>
 
-  <div data-people-rule-builder-target="booleanInputGroup" style="display:none;">
-    <label>Value</label>
-    <select name="<%= @form.object_name %>[value]" class="form-select">
-      <option value="true">True</option>
-      <option value="false">False</option>
-    </select>
-  </div>
+  <%= form.hidden_field :ruleable_type, value: "Trait" %>
 
-  <div data-people-rule-builder-target="datetimeInputGroup" style="display:none;">
-    <label>Value</label>
-    <input type="datetime-local" name="<%= @form.object_name %>[value]" class="form-control" />
-  </div>
-
-  <div data-people-rule-builder-target="datetimeRangeGroup" style="display:none;">
-    <label>From</label>
-    <input type="datetime-local" name="<%= @form.object_name %>[from]" class="form-control" />
-    <label>To</label>
-    <input type="datetime-local" name="<%= @form.object_name %>[to]" class="form-control" />
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" name="<%= @form.object_name %>[inclusive]" value="true" />
-      <label class="form-check-label">Values inclusive</label>
+  <div class="field"
+    data-people-rule-builder-target="operatorGroup">
+    <label class="label" for="operator_<%= state %>">Operator</label>
+    <div class="control">
+      <div class="select">
+        <%= form.select(
+          :operator,
+          options_for_select([]),
+          { include_blank: "Select an operator" },
+          {
+            class: "input",
+            id: "operator_#{state}",
+            data: {
+              "people-rule-builder-target": "operatorSelector",
+              action: "change->people-rule-builder#handleOperatorChange"
+            }
+          }
+        ) %>
+      </div>
     </div>
   </div>
 
-  <div class="actions">
-    <button type="button" class="btn btn-secondary" data-action="click->rule-builder#addRule">Add Rule</button>
+  <!-- textInputGroup -->
+  <div class="field"
+    data-people-rule-builder-target="textInputGroup"
+    style="display: none;">
+    <label class="label" for="value_text_<%= state %>">Value (Text)</label>
+    <div class="control">
+      <%= form.text_field :value, class: "input", id: "value_text_#{state}" %>
+    </div>
+    <div class="field"
+      data-people-rule-builder-target="caseSensitiveGroup"
+      style="display: none;">
+      <label class="checkbox" for="case_sensitive_<%= state %>">
+        <%= form.check_box :case_sensitive, id: "case_sensitive_#{state}" %> Case sensitive
+      </label>
+    </div>
+  </div>
+
+  <!-- numericInputGroup -->
+  <div class="field"
+    data-people-rule-builder-target="numericInputGroup"
+    style="display: none;">
+    <label class="label" for="value_numeric_<%= state %>">Value (Numeric)</label>
+    <div class="control">
+      <%= form.number_field :value, class: "input", id: "value_numeric_#{state}" %>
+    </div>
+  </div>
+
+  <!-- numericRangeGroup -->
+  <div class="field"
+    data-people-rule-builder-target="numericRangeGroup"
+    style="display: none;">
+    <label class="label" for="from_value_numeric_<%= state %>">From</label>
+    <div class="control">
+      <%= form.number_field :from, class: "input", id: "from_value_numeric_#{state}" %>
+    </div>
+
+    <label class="label" for="to_value_numeric_<%= state %>">To</label>
+    <div class="control">
+      <%= form.number_field :to, class: "input", id: "to_value_numeric_#{state}" %>
+    </div>
+
+    <div class="field">
+      <label class="checkbox" for="inclusive_<%= state %>">
+        <%= form.check_box :inclusive, id: "inclusive_#{state}" %> Values inclusive
+      </label>
+    </div>
+  </div>
+
+  <!-- booleanInputGroup -->
+  <div class="field"
+    data-people-rule-builder-target="booleanInputGroup"
+    style="display: none;">
+    <label class="label" for="boolean_value_<%= state %>">Value (Boolean)</label>
+    <div class="control">
+      <div class="select">
+        <%= form.select(
+          :value,
+          options_for_select([["True", "true"], ["False", "false"]]),
+          { include_blank: "Select a boolean" },
+          {
+            class: "input",
+            id: "boolean_value_#{state}"
+          }
+        ) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- datetimeInputGroup -->
+  <div class="field"
+    data-people-rule-builder-target="datetimeInputGroup"
+    style="display: none;">
+    <label class="label" for="datetime_value_<%= state %>">Value (Datetime)</label>
+    <div class="control">
+      <%= form.datetime_local_field :value, class: "input", id: "datetime_value_#{state}" %>
+    </div>
+  </div>
+
+  <!-- datetimeRangeGroup -->
+  <div class="field"
+    data-people-rule-builder-target="datetimeRangeGroup"
+    style="display: none;">
+    <label class="label" for="datetime_from_value_<%= state %>">From</label>
+    <div class="control">
+      <%= form.datetime_local_field :from, class: "input", id: "datetime_from_value_#{state}" %>
+    </div>
+
+    <label class="label" for="datetime_to_value_<%= state %>">To</label>
+    <div class="control">
+      <%= form.datetime_local_field :to, class: "input", id: "datetime_to_value_#{state}" %>
+    </div>
+
+    <div class="field">
+      <label class="checkbox" for="datetime_inclusive_<%= state %>">
+        <%= form.check_box :inclusive, id: "datetime_inclusive_#{state}" %> Values inclusive
+      </label>
+    </div>
   </div>
 </div>

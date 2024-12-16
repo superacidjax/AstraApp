@@ -1,8 +1,8 @@
-<h1>Goals</h1>
+<h1 class="title">Goals</h1>
 
-<%= link_to "Create New Goal", new_goal_path, class: "btn btn-primary" %>
+<%= link_to "Create New Goal", new_goal_path, class: "button is-primary" %>
 
-<table class="table">
+<table class="table is-fullwidth is-striped">
   <thead>
     <tr>
       <th>Name</th>
@@ -17,7 +17,7 @@
         <td><%= goal.name %></td>
         <td><%= truncate(goal.description, length: 100) %></td>
         <td>
-          <%= link_to "Show", goal_path(goal), class: "btn btn-secondary" %>
+          <%= link_to "Show", goal_path(goal), class: "button is-light" %>
         </td>
       </tr>
     <% end %>

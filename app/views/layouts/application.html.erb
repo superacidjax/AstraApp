@@ -18,6 +18,44 @@
   </head>
 
   <body>
-    <%= yield %>
+    <!-- Top Nav -->
+    <nav class="navbar is-white is-spaced" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-weight-bold is-size-5" href="/">
+          AstraGoal
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu"
+           aria-expanded="false" data-target="mainNavbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="mainNavbar" class="navbar-menu is-centered-navbar">
+        <div class="navbar-center">
+          <%= link_to "Goals", goals_path, class: "navbar-item" %>
+          <a class="navbar-item" href="#">Flows</a>
+          <a class="navbar-item" href="#">Reports</a>
+          <a class="navbar-item" href="#">Data</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-6">
+      <% if flash[:notice] %>
+        <div class="notification is-success">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+
+      <% if flash[:alert] %>
+        <div class="notification is-danger">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </div>
   </body>
 </html>

@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [
-    "clientApplications",
     "traitSelector",
     "operatorSelector",
     "operatorGroup",
@@ -18,78 +17,19 @@ export default class extends Controller {
   ]
 
   connect() {
-    // Initialization if needed
-  }
+    console.log("people rule builder connected")
 
-  toggleRuleFields(event) {
-    const selectedRuleType = event.target.value
-    const ruleFields = this.ruleFieldsTarget
-
-    if (selectedRuleType === "person_rule") {
-      this.personRuleFieldsTarget.style.display = "block"
-      this.eventRuleFieldsTarget.style.display = "none"
-      // Set the type field to PersonRule
-      const ruleTypeField = ruleFields.querySelector(".rule-type-field")
-      if (ruleTypeField) {
-        ruleTypeField.value = "PersonRule"
-      }
-    } else if (selectedRuleType === "event_rule") {
-      this.personRuleFieldsTarget.style.display = "none"
-      this.eventRuleFieldsTarget.style.display = "block"
-      // Set the type field to EventRule
-      const ruleTypeField = ruleFields.querySelector(".rule-type-field")
-      if (ruleTypeField) {
-        ruleTypeField.value = "EventRule"
-      }
+    // If traits are provided in data-people-rule-builder-traits-value,
+    // we can parse them here:
+    const traitsValue = this.element.dataset.peopleRuleBuilderTraitsValue
+    if (traitsValue) {
+      this.allTraits = JSON.parse(traitsValue)
     } else {
-      this.personRuleFieldsTarget.style.display = "none"
-      this.eventRuleFieldsTarget.style.display = "none"
-      // Clear the type field
-      const ruleTypeField = ruleFields.querySelector(".rule-type-field")
-      if (ruleTypeField) {
-        ruleTypeField.value = ""
-      }
+      this.allTraits = []
     }
   }
 
-  filterTraits() {
-    const selectedClientAppIds = Array.from(
-      this.clientApplicationsTarget.selectedOptions
-    ).map((option) => option.value)
-    const allOptionSelected = selectedClientAppIds.includes("all")
-
-    this.clearTraitOptions()
-
-    const filteredTraits = allOptionSelected
-      ? this.allTraits
-      : this.allTraits.filter((trait) =>
-          trait.client_application_ids.some((id) =>
-            selectedClientAppIds.includes(id.toString())
-          )
-        )
-
-    this.populateTraitSelector(filteredTraits)
-  }
-
-  clearTraitOptions() {
-    this.traitSelectorTarget.innerHTML = ""
-    const defaultOption = document.createElement("option")
-    defaultOption.value = ""
-    defaultOption.textContent = "Select a trait"
-    this.traitSelectorTarget.appendChild(defaultOption)
-  }
-
-  populateTraitSelector(traits) {
-    traits.forEach((trait) => {
-      const option = document.createElement("option")
-      option.value = trait.id.toString()
-      option.textContent = trait.name
-      option.dataset.valueType = trait.value_type
-      this.traitSelectorTarget.appendChild(option)
-    })
-  }
-
-  updateOperator(event) {
+    updateOperator(event) {
     const selectedTraitId = event.target.value
 
     // Find the trait based on the selected ID
@@ -106,7 +46,7 @@ export default class extends Controller {
       return
     }
 
-    // Store the selected value type for use in handleOperatorChange
+    // Store the selected value type for handleOperatorChange
     this.selectedValueType = selectedTrait.value_type
 
     let operators = []
@@ -169,7 +109,6 @@ export default class extends Controller {
 
     // Ensure selectedValueType is set
     if (!this.selectedValueType) {
-      // Find the selected trait
       const selectedTraitId = this.traitSelectorTarget.value
       const selectedTrait = this.allTraits.find(
         (trait) => trait.id.toString() === selectedTraitId
