@@ -2,6 +2,8 @@ class Goal < ApplicationRecord
   belongs_to :account
   has_many :goal_rules, dependent: :destroy
   has_many :rules, through: :goal_rules
+  has_many :flow_goals
+  has_many :flows, through: :flow_goals
 
   accepts_nested_attributes_for :goal_rules, allow_destroy: true
 
