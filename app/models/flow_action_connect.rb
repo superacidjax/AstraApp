@@ -1,4 +1,4 @@
 class FlowActionConnect < FlowAction
-  jsonb_accessor :flow_data,
+  jsonb_accessor :data,
     data_to_send: :string
 end

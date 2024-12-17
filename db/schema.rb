@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_14_120636) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_17_171952) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -96,11 +96,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_14_120636) do
     t.uuid "action_id", null: false
     t.uuid "flow_id", null: false
     t.string "type", null: false
-    t.jsonb "flow_data", default: {}, null: false
+    t.jsonb "data", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["action_id"], name: "index_flow_actions_on_action_id"
-    t.index ["flow_data"], name: "index_flow_actions_on_flow_data", using: :gin
+    t.index ["data"], name: "index_flow_actions_on_data", using: :gin
     t.index ["flow_id"], name: "index_flow_actions_on_flow_id"
     t.index ["type"], name: "index_flow_actions_on_type"
   end

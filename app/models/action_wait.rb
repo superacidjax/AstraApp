@@ -1,1 +1,4 @@
-class ActionWait < Action; end
+class ActionWait < Action
+jsonb_accessor :data,
+  duration: :string
+end

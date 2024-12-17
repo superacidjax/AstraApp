@@ -1,4 +1,4 @@
 class FlowActionNotify < FlowAction
-  jsonb_accessor :flow_data,
+  jsonb_accessor :data,
     destination: :string
 end

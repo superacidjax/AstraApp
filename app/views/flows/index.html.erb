@@ -1,0 +1,48 @@
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <div class="level mb-4">
+          <div class="level-left">
+            <h1 class="title">Flows</h1>
+          </div>
+          <div class="level-right">
+            <%= link_to "Create New Flow", new_flow_path, class: "button is-primary" %>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Goals</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% @flows.each do |flow| %>
+                <tr>
+                  <td><%= flow.name %></td>
+                  <td>
+                    <% if flow.goals.any? %>
+                      <%= flow.goals.map(&:name).join(", ") %>
+                    <% else %>
+                      No goals
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= link_to "Show", flow_path(flow), class: "button is-light" %>
+                    <%= link_to "Edit", edit_flow_path(flow), class: "button is-light" %>
+                    <%= link_to "Destroy", flow_path(flow), method: :delete, data: { confirm: "Are you sure?" }, class: "button is-danger is-light" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
