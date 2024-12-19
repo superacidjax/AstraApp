@@ -1,6 +1,5 @@
 Fabricator(:flow_action) do
   flow
-  action
-  type { "FlowAction" }
+  action { Fabricate(:action_sms) }
   data { {} }
 end
