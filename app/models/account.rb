@@ -1,4 +1,5 @@
 class Account < ApplicationRecord
+  has_many :actions
   has_many :client_applications, dependent: :destroy
   has_many :events, through: :client_applications
   has_many :flows, dependent: :destroy

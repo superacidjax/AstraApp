@@ -1,0 +1,63 @@
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <%= form_with(model: @flow, url: @url, method: @method, local: true, data: { controller: "flow-form" }) do |form| %>
+          <div class="field">
+            <%= form.label :name, "Name", class: "label" %>
+            <div class="control">
+              <%= form.text_field :name, class: "input" %>
+            </div>
+          </div>
+
+          <% @flow.flow_goals.each_with_index do |flow_goal, i| %>
+            <%= form.fields_for :flow_goals, flow_goal, child_index: i do |fg_form| %>
+              <div class="field">
+                <%= fg_form.label :goal_id, "Goal", class: "label" %>
+                <div class="control">
+                  <div class="select">
+                    <%= fg_form.select :goal_id, @goals, include_blank: "Select a goal" %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <% @flow.flow_actions.each_with_index do |flow_action, j| %>
+            <% if flow_action.is_a?(FlowActionSms) %>
+              <%= form.fields_for :flow_actions, flow_action, child_index: j do |fa_form| %>
+                <div class="field mt-4">
+                  <div class="field">
+                    <%= fa_form.label :action_id, "Action", class: "label" %>
+                    <div class="control">
+                      <div class="select">
+                        <%= fa_form.select :action_id, @sms_actions,
+                          include_blank: "Select SMS Action" %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <%= fa_form.label :content, "SMS Content", class: "label" %>
+                    <div class="control">
+                      <%= fa_form.text_area :content, class: "textarea" %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <div class="field is-grouped mt-5">
+            <div class="control">
+              <%= form.submit "Save Flow", class: "button is-primary" %>
+            </div>
+            <div class="control">
+              <%= link_to "Back", flows_path, class: "button" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

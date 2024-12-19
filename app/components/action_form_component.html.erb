@@ -1,0 +1,34 @@
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <%= form_with(model: @action_record, scope: :action_record, url: @url, method: @method, local: true, data: { turbo: false }) do |form| %>
+          <div class="field">
+            <%= form.label :name, "Name", class: "label" %>
+            <div class="control">
+              <%= form.text_field :name, class: "input" %>
+            </div>
+          </div>
+
+          <div class="field">
+            <%= form.label :type, "Action Type", class: "label" %>
+            <div class="control">
+              <div class="select">
+                <%= form.select :type, @action_types, include_blank: "Select an action type" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped mt-5">
+            <div class="control">
+              <%= form.submit "Save Action", class: "button is-primary" %>
+            </div>
+            <div class="control">
+              <%= link_to "Back", actions_path, class: "button" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

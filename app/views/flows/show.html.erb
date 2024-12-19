@@ -1,0 +1,51 @@
+<div class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <h1 class="title"><%= @flow.name %></h1>
+
+        <% if @flow.goals.any? %>
+          <h2 class="title is-4 mt-4">Goals</h2>
+          <ul>
+            <% @flow.flow_goals.includes(:goal).each do |flow_goal| %>
+              <li>
+                <strong>Goal:</strong> <%= flow_goal.goal.name %><br>
+                <strong>Success Rate:</strong> <%= flow_goal.success_rate %>%
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p>No goals associated with this flow.</p>
+        <% end %>
+
+        <% if @flow.flow_actions.any? %>
+          <h2 class="title is-4 mt-5">Actions</h2>
+          <% @flow.flow_actions.includes(:action).each do |flow_action| %>
+            <% if flow_action.is_a?(FlowActionSms) %>
+              <div class="box">
+                <p><strong>Action Type:</strong> SMS</p>
+                <p><strong>Action Name:</strong> <%= flow_action.action.name %></p>
+                <p><strong>Content:</strong> <%= flow_action.content %></p>
+              </div>
+            <% else %>
+              <div class="box">
+                <p>Unknown action type</p>
+              </div>
+            <% end %>
+          <% end %>
+        <% else %>
+          <p>No actions associated with this flow.</p>
+        <% end %>
+
+        <div class="field is-grouped mt-5">
+          <div class="control">
+            <%= link_to "Edit", edit_flow_path(@flow), class: "button is-primary" %>
+          </div>
+          <div class="control">
+            <%= link_to "Back to Flows", flows_path, class: "button" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

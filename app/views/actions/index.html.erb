@@ -1,0 +1,10 @@
+<h1> Actions </h1>
+<%= link_to "Create New Action", new_action_path, class: "button is-primary" %>
+<% @actions.each do |action_record| %>
+  <%= render ActionComponent.new(action_record: action_record) %></td>
+<%= link_to "Show", action_path(action_record), class: "button is-light" %>
+<%= link_to "Edit", edit_action_path(action_record), class: "button is-light" %>
+<%= link_to "Destroy", action_path(action_record),
+  method: :delete, data: { confirm: "Are you sure?" },
+  class: "button is-danger is-light" %>
+  <% end %>

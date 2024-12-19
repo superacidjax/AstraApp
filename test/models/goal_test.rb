@@ -30,7 +30,6 @@ class GoalTest < ActiveSupport::TestCase
 
   test "should require GoalRules to have states initial and end" do
     goal = Fabricate.build(:goal_with_rules)
-    initial_rule = goal.goal_rules.first
     end_rule  = goal.goal_rules.last
     end_rule.state = "initial"
     assert_not goal.valid?, "Goal should be invalid if GoalRules do not include both 'initial' and 'end' states"

@@ -13,7 +13,7 @@ class FlowActionTest < ActiveSupport::TestCase
   test "should save FlowActionEmail with template_id and deliver_at" do
     skip
     template_id = UUID7.generate
-    flow_action = Fabricate.build(:flow_action_email, flow: @flow, flow_data: {
+    flow_action = Fabricate.build(:flow_action_email, flow: @flow, data: {
       template_id: template_id,
       deliver_at: "2024-09-01 12:00:00"
     })
@@ -25,7 +25,7 @@ class FlowActionTest < ActiveSupport::TestCase
   test "should save FlowActionSms with template_id" do
     skip
     template_id = UUID7.generate
-    flow_action = Fabricate.build(:flow_action_sms, flow: @flow, flow_data: {
+    flow_action = Fabricate.build(:flow_action_sms, flow: @flow, data: {
       template_id: template_id
     })
 
@@ -34,7 +34,7 @@ class FlowActionTest < ActiveSupport::TestCase
 
   test "should save FlowActionWait with wait_in_seconds" do
     skip
-    flow_action = Fabricate.build(:flow_action_wait, flow: @flow, flow_data: {
+    flow_action = Fabricate.build(:flow_action_wait, flow: @flow, data: {
       wait_in_seconds: 3600
     })
 
@@ -44,7 +44,7 @@ class FlowActionTest < ActiveSupport::TestCase
 
   test "should save FlowActionNotify with destination" do
     skip
-    flow_action = Fabricate.build(:flow_action_notify, flow: @flow, flow_data: {
+    flow_action = Fabricate.build(:flow_action_notify, flow: @flow, data: {
       destination: "user@example.com"
     })
 
@@ -54,7 +54,7 @@ class FlowActionTest < ActiveSupport::TestCase
 
   test "should save FlowActionConnect with data_to_send" do
     skip
-    flow_action = Fabricate.build(:flow_action_connect, flow: @flow, flow_data: {
+    flow_action = Fabricate.build(:flow_action_connect, flow: @flow, data: {
       data_to_send: "Some data"
     })
 
