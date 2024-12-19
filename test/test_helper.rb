@@ -9,6 +9,7 @@ Dir[Rails.root.join("test", "support", "**", "*.rb")].each { |f| require f }
 
 module ActiveSupport
   class TestCase
+    Capybara.default_max_wait_time = 5
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 

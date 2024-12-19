@@ -57,7 +57,7 @@ class FlowsController < ApplicationController
   end
 
   def ensure_associations(flow)
-    flow.flow_goals.build(success_rate: 100.0) if flow.flow_goals.empty?
+    flow.flow_goals.build if flow.flow_goals.empty?
     if flow.flow_actions.empty?
       action_id = @sms_actions.first&.last
       flow.flow_actions.build(type: "FlowActionSms", data: {}, action_id: action_id)
@@ -74,7 +74,6 @@ class FlowsController < ApplicationController
       ],
       flow_actions_attributes: [
         :id,
-        :type,
         :action_id,
         :_destroy,
         { data: [ :content ] }
