@@ -4,4 +4,12 @@ class Action < ApplicationRecord
   has_many :flows, through: :flow_actions
 
   validates :name, presence: true
+
+  private
+
+  def ensure_subclass
+    if self.class == Action
+      errors.add(:base, "Cannot instantiate abstract class Action directly")
+    end
+  end
 end
